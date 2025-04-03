@@ -21,6 +21,7 @@ public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_LIGHT_TEXT = new Color(100, 100, 100);
 	private static final Color COLOR_WHITE = new Color(255, 255, 255);
 	private static final Color COLOR_WIDGET_BACKGROUND = new Color(240, 240, 240);
+	private static final Color COLOR_HEADER_TEXT = new Color(20, 20, 20);
 	private static final Color COLOR_ORANGE_HIGHLIGHT = new Color(255, 231, 156);
 	private static final Color COLOR_ORANGE_HIGHLIGHT_HEADER = new Color(247, 224, 147);
 	private static final Color COLOR_EVENT_BACKGROUND = new Color(195, 213, 234);
@@ -213,6 +214,7 @@ public class CalendarCanvas extends Canvas {
 		for (int i = 0; i < 7; i++) {
 			int width = gc.textExtent(dayNames[i]).x;
 			gc.setBackground(COLOR_WIDGET_BACKGROUND);
+			gc.setForeground(COLOR_HEADER_TEXT);
 			gc.fillRectangle((int) (i * cellWidth), CALENDAR_HEADER_HEIGHT / 2, (int) cellWidth,
 					CALENDAR_HEADER_HEIGHT / 2);
 			gc.drawText(dayNames[i], (int) ((i + 0.5) * cellWidth) - width / 2, 2, true);
