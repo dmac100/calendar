@@ -24,6 +24,7 @@ public class EventDetailsDialog extends Dialog {
 	private Combo endHourCombo;
 	private Combo endMinuteCombo;
 	private Button allDayCheckbox;
+	private Button hasEndCheckbox;
 
 	public EventDetailsDialog(Shell parent, CalendarEvent event) {
 		super(parent);
@@ -70,6 +71,18 @@ public class EventDetailsDialog extends Dialog {
 		Composite startTimeComposite = new Composite(shell, SWT.NONE);
 		startTimeComposite.setLayout(new GridLayout(2, false));
 		startTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		Label hasEndLabel = new Label(shell, SWT.NONE);
+		hasEndLabel.setText("Has End Time:");
+		hasEndLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+
+		hasEndCheckbox = new Button(shell, SWT.CHECK);
+		hasEndCheckbox.setSelection(!event.isAllDay() && event.getEndTime() != null);
+		hasEndCheckbox.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				refreshEnabled();
+			}
+		});
 
 		Label endTimeLabel = new Label(shell, SWT.NONE);
 		endTimeLabel.setText("End Time:");
@@ -154,10 +167,11 @@ public class EventDetailsDialog extends Dialog {
 
 	private void refreshEnabled() {
 		boolean allDay = allDayCheckbox.getSelection();
+		boolean hasEnd = hasEndCheckbox.getSelection();
 		startHourCombo.setEnabled(!allDay);
 		startMinuteCombo.setEnabled(!allDay);
-		endHourCombo.setEnabled(!allDay);
-		endMinuteCombo.setEnabled(!allDay);
+		endHourCombo.setEnabled(!allDay && hasEnd);
+		endMinuteCombo.setEnabled(!allDay && hasEnd);
 	}
 
 	private void saveChanges() {
@@ -175,9 +189,13 @@ public class EventDetailsDialog extends Dialog {
 			}
 
 			if (endHourCombo.getText().length() > 0 && endMinuteCombo.getText().length() > 0) {
-				int endHour = Integer.parseInt(endHourCombo.getText());
-				int endMinute = Integer.parseInt(endMinuteCombo.getText());
-				event.setEndTime(LocalTime.of(endHour, endMinute));
+				if(hasEndCheckbox.getSelection()) {
+					int endHour = Integer.parseInt(endHourCombo.getText());
+					int endMinute = Integer.parseInt(endMinuteCombo.getText());
+					event.setEndTime(LocalTime.of(endHour, endMinute));
+				} else {
+					event.setEndTime(null);
+				}
 			}
 		}
 
