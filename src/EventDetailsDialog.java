@@ -65,7 +65,7 @@ public class EventDetailsDialog extends Dialog {
 
 		// Time Selection
 		Label startTimeLabel = new Label(shell, SWT.NONE);
-		startTimeLabel.setText("Start Time:");
+		startTimeLabel.setText("Start time:");
 		startTimeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		Composite startTimeComposite = new Composite(shell, SWT.NONE);
@@ -73,7 +73,7 @@ public class EventDetailsDialog extends Dialog {
 		startTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		Label hasEndLabel = new Label(shell, SWT.NONE);
-		hasEndLabel.setText("Has End Time:");
+		hasEndLabel.setText("Has end time:");
 		hasEndLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		hasEndCheckbox = new Button(shell, SWT.CHECK);
@@ -85,7 +85,7 @@ public class EventDetailsDialog extends Dialog {
 		});
 
 		Label endTimeLabel = new Label(shell, SWT.NONE);
-		endTimeLabel.setText("End Time:");
+		endTimeLabel.setText("End time:");
 		endTimeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		Composite endTimeComposite = new Composite(shell, SWT.NONE);
