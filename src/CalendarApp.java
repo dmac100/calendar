@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +9,6 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -19,16 +18,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 
 public class CalendarApp {
 	private static final Color COLOR_BLUE_HIGHLIGHT = new Color(46, 78, 145);
 	private static final Color COLOR_WHITE = new Color(255, 255, 255);
-
-	private Font normalFont;
-	private Font boldFont;
 
 	private Display display;
 	private Shell shell;
@@ -38,24 +31,12 @@ public class CalendarApp {
 	private EventTable eventTable;
 	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
 
-	private LocalDate selectedDate = LocalDate.of(2025, 04, 04);
 	private List<CalendarEvent> events = new ArrayList<>();
 
 	public CalendarApp() {
 		display = new Display();
 		shell = new Shell(display);
 		currentDate = LocalDate.now();
-
-		loadFonts();
-	}
-
-	private void loadFonts() {
-		this.normalFont = Display.getCurrent().getSystemFont();
-
-		FontData fontData = normalFont.getFontData()[0];
-		fontData.setStyle(SWT.BOLD);
-
-		this.boldFont = new Font(display, fontData);
 	}
 
 	public void open() {
@@ -167,10 +148,8 @@ public class CalendarApp {
 		events.add(new CalendarEvent(LocalDate.of(2025, 4, 1), "Lunch with Client", "Discuss project requirements"));
 		events.add(new CalendarEvent(LocalDate.of(2025, 4, 4), "Doctor Appointment", "Annual checkup"));
 
-		eventTable.updateEvents();
-	}
+		events.get(0).setStartTime(LocalTime.of(14, 0));
 
-	private void updateEventTable() {
 		eventTable.updateEvents();
 	}
 

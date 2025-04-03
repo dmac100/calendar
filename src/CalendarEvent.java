@@ -1,10 +1,13 @@
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class CalendarEvent {
 	private LocalDate date;
 	private String title;
 	private String description;
 	private boolean selected;
+	private LocalTime startTime;
+	private LocalTime endTime;
 
 	public CalendarEvent() {
 	}
@@ -45,6 +48,26 @@ public class CalendarEvent {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+	
+	public LocalTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public LocalTime getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+	}
+	
+	public boolean isAllDay() {
+		return (startTime == null);
 	}
 
 	@Override

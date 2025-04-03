@@ -161,30 +161,30 @@ public class CalendarCanvas extends Canvas {
 
 						notifyListeners(SWT.Modify, new Event());
 						redraw();
-						
+
 						return;
 					}
 				}
 			}
-			
+
 			CalendarEvent newEvent = new CalendarEvent();
 			newEvent.setDate(clickedDate);
 			newEvent.setDescription("");
 			newEvent.setSelected(true);
 			newEvent.setTitle("New Event");
-			
+
 			EventDetailsDialog dialog = new EventDetailsDialog(getShell(), newEvent);
 			dialog.open();
-			
-			if(dialog.wasSaved()) {
+
+			if (dialog.wasSaved()) {
 				events.add(newEvent);
-				
+
 				notifyListeners(SWT.Modify, new Event());
 				redraw();
 			}
 		}
 	}
-	
+
 	private void deselectAllEvents() {
 		for (CalendarEvent event : events) {
 			if (event.isSelected()) {
@@ -262,6 +262,11 @@ public class CalendarCanvas extends Canvas {
 
 					for (int eventIndex = 0; eventIndex < Math.min(dayEvents.size(), 2); eventIndex++) {
 						CalendarEvent event = dayEvents.get(eventIndex);
+						String text = event.getTitle();
+						if (event.getStartTime() != null) {
+							text = event.getStartTime().toString() + " " + text;
+						}
+
 						gc.setBackground(COLOR_EVENT_BACKGROUND);
 						gc.setForeground(COLOR_EVENT_BORDER);
 						if (event.isSelected()) {
@@ -273,7 +278,7 @@ public class CalendarCanvas extends Canvas {
 						gc.drawRectangle(x + 3, y + dayHeaderHeight + eventIndex * (eventHeight + 2),
 								(int) cellWidth - 4, eventHeight);
 						gc.setForeground(COLOR_EVENT_TEXT);
-						gc.drawText(event.getTitle(), x + 5, y + dayHeaderHeight + eventIndex * (eventHeight + 2) + 1);
+						gc.drawText(text, x + 5, y + dayHeaderHeight + eventIndex * (eventHeight + 2) + 1);
 					}
 
 					gc.setClipping(clientArea);

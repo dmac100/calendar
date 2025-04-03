@@ -17,7 +17,6 @@ public class EventTable {
 	private Table table;
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 	private List<CalendarEvent> events;
-	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Listener eventChangeListener;
 
 	public EventTable(Composite parent) {
@@ -30,6 +29,14 @@ public class EventTable {
 		dateColumn.setText("Date");
 		dateColumn.setWidth(100);
 
+		TableColumn startTimeColumn = new TableColumn(table, SWT.NONE);
+		startTimeColumn.setText("Start");
+		startTimeColumn.setWidth(200);
+		
+		TableColumn endTimeColumn = new TableColumn(table, SWT.NONE);
+		endTimeColumn.setText("End");
+		endTimeColumn.setWidth(200);
+		
 		TableColumn titleColumn = new TableColumn(table, SWT.NONE);
 		titleColumn.setText("Event");
 		titleColumn.setWidth(200);
@@ -73,8 +80,13 @@ public class EventTable {
 		table.removeAll();
 		for (CalendarEvent event : events) {
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(
-					new String[] { event.getDate().format(DATE_FORMATTER), event.getTitle(), event.getDescription() });
+			item.setText(new String[] {
+				event.getDate().format(DATE_FORMATTER),
+				(event.getStartTime() != null ? event.getStartTime().toString() : ""),
+				(event.getEndTime() != null ? event.getEndTime().toString() : ""),
+				event.getTitle(),
+				event.getDescription()
+			});
 		}
 	}
 
