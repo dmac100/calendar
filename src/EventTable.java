@@ -38,16 +38,14 @@ public class EventTable {
 		endTimeColumn.setWidth(200);
 		
 		TableColumn titleColumn = new TableColumn(table, SWT.NONE);
-		titleColumn.setText("Event");
+		titleColumn.setText("Title");
 		titleColumn.setWidth(200);
 
 		TableColumn descriptionColumn = new TableColumn(table, SWT.NONE);
 		descriptionColumn.setText("Description");
 		descriptionColumn.setWidth(300);
 
-		// Add keyboard listener for Delete key
 		table.addKeyListener(new KeyAdapter() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.DEL) {
 					int[] selectionIndices = table.getSelectionIndices();
@@ -62,6 +60,24 @@ public class EventTable {
 				}
 			}
 		});
+		
+		TableSorter.addSortHandlers(table, () -> {
+			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
+			TableSorter.sortBy(events, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
+			
+			updateEvents();
+		});
+	}
+
+	private String getField(CalendarEvent event, int index) {
+		return switch(index) {
+			case 0 -> event.getDate().format(DATE_FORMATTER);
+			case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
+			case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
+			case 3 -> event.getTitle();
+			case 4 -> event.getDescription();
+			default -> "";
+		};
 	}
 
 	public void setEventChangeListener(Listener listener) {
