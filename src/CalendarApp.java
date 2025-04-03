@@ -26,18 +26,18 @@ import org.eclipse.swt.widgets.TableItem;
 public class CalendarApp {
 	private static final Color COLOR_BLUE_HIGHLIGHT = new Color(46, 78, 145);
 	private static final Color COLOR_WHITE = new Color(255, 255, 255);
-	
+
 	private Font normalFont;
 	private Font boldFont;
-	
+
 	private Display display;
 	private Shell shell;
 	private Label monthLabel;
 	private LocalDate currentDate;
 	private CalendarCanvas calendarCanvas;
-	private Table eventTable;
+	private EventTable eventTable;
 	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
-	
+
 	private LocalDate selectedDate = LocalDate.of(2025, 04, 04);
 	private List<CalendarEvent> events = new ArrayList<>();
 
@@ -45,16 +45,16 @@ public class CalendarApp {
 		display = new Display();
 		shell = new Shell(display);
 		currentDate = LocalDate.now();
-		
+
 		loadFonts();
 	}
-	
+
 	private void loadFonts() {
 		this.normalFont = Display.getCurrent().getSystemFont();
-		
+
 		FontData fontData = normalFont.getFontData()[0];
 		fontData.setStyle(SWT.BOLD);
-		
+
 		this.boldFont = new Font(display, fontData);
 	}
 
@@ -63,7 +63,7 @@ public class CalendarApp {
 		shell.setSize(900, 600);
 		GridLayout shellLayout = new GridLayout(1, false);
 		shell.setLayout(shellLayout);
-		
+
 		createMenuBar();
 
 		// Create SashForm for draggable divider
@@ -79,18 +79,8 @@ public class CalendarApp {
 		topComposite.setLayout(topLayout);
 
 		// Create event table
-		eventTable = new Table(topComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
-		eventTable.setHeaderVisible(true);
-		eventTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		// Add columns to the table
-		TableColumn dateColumn = new TableColumn(eventTable, SWT.NONE);
-		dateColumn.setText("Date");
-		dateColumn.setWidth(100);
-
-		TableColumn titleColumn = new TableColumn(eventTable, SWT.NONE);
-		titleColumn.setText("Event");
-		titleColumn.setWidth(200);
+		eventTable = new EventTable(topComposite);
+		eventTable.setEvents(events);
 
 		// Create composite for the bottom section (calendar)
 		Composite bottomComposite = new Composite(sashForm, SWT.NONE);
@@ -114,7 +104,7 @@ public class CalendarApp {
 		Button prevButton = new Button(navComposite, SWT.PUSH);
 		prevButton.setText("←");
 		prevButton.addListener(SWT.Selection, e -> changeMonth(-1));
-		
+
 		// Next month button
 		Button nextButton = new Button(navComposite, SWT.PUSH);
 		nextButton.setText("→");
@@ -130,6 +120,9 @@ public class CalendarApp {
 		calendarCanvas = new CalendarCanvas(bottomComposite, currentDate, events);
 		calendarCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		// Add listener for event changes
+		calendarCanvas.addListener(SWT.Modify, e -> eventTable.updateEvents());
+
 		// Set initial sash weights (20/80 split)
 		sashForm.setWeights(new int[] { 20, 80 });
 
@@ -138,8 +131,8 @@ public class CalendarApp {
 
 		shell.open();
 
-		while(!shell.isDisposed()) {
-			if(!display.readAndDispatch()) {
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
@@ -148,16 +141,16 @@ public class CalendarApp {
 
 	private void createMenuBar() {
 		Menu menuBar = new Menu(shell, SWT.BAR);
-		
+
 		MenuItem fileMenuItem = new MenuItem(menuBar, SWT.CASCADE);
 		fileMenuItem.setText("File");
-		
+
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuItem.setMenu(fileMenu);
-		
+
 		MenuItem exitItem = new MenuItem(fileMenu, SWT.NONE);
 		exitItem.setText("Exit");
-		
+
 		exitItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.exit(0);
@@ -172,21 +165,12 @@ public class CalendarApp {
 		events.add(new CalendarEvent(LocalDate.of(2025, 4, 1), "Team Meeting", "Weekly team sync"));
 		events.add(new CalendarEvent(LocalDate.of(2025, 4, 1), "Lunch with Client", "Discuss project requirements"));
 		events.add(new CalendarEvent(LocalDate.of(2025, 4, 4), "Doctor Appointment", "Annual checkup"));
-		
-		// Update the event table
-		updateEventTable();
+
+		eventTable.updateEvents();
 	}
-	
+
 	private void updateEventTable() {
-		eventTable.removeAll();
-		for (CalendarEvent event : events) {
-			TableItem item = new TableItem(eventTable, SWT.NONE);
-			item.setText(new String[] { 
-				event.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
-				event.getTitle(),
-				event.getDescription()
-			});
-		}
+		eventTable.updateEvents();
 	}
 
 	private void updateMonthLabel() {

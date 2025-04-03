@@ -1,42 +1,42 @@
 import java.time.LocalDate;
 
 public class CalendarEvent {
-    private LocalDate date;
-    private String title;
-    private String description;
-    private boolean selected;
+	private LocalDate date;
+	private String title;
+	private String description;
+	private boolean selected;
 
-    public CalendarEvent(LocalDate date, String title, String description) {
-        this.date = date;
-        this.title = title;
-        this.description = description;
-    }
+	public CalendarEvent(LocalDate date, String title, String description) {
+		this.date = date;
+		this.title = title;
+		this.description = description;
+	}
 
-    public LocalDate getDate() {
-        return date;
-    }
+	public LocalDate getDate() {
+		return date;
+	}
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public boolean isSelected() {
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public boolean isSelected() {
 		return selected;
 	}
 
@@ -45,7 +45,7 @@ public class CalendarEvent {
 	}
 
 	@Override
-    public String toString() {
-        return title;
-    }
-} 
+	public String toString() {
+		return title;
+	}
+}
