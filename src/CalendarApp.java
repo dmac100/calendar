@@ -41,7 +41,7 @@ public class CalendarApp {
 
 	public void open() {
 		shell.setText("SWT Calendar");
-		shell.setSize(900, 600);
+		shell.setSize(1200, 800);
 		GridLayout shellLayout = new GridLayout(1, false);
 		shell.setLayout(shellLayout);
 
