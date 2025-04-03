@@ -14,6 +14,7 @@ public class EventDetailsDialog extends Dialog {
 	private Shell dialogShell;
 	private Text titleText;
 	private Text descriptionText;
+	private boolean saved;
 
 	public EventDetailsDialog(Shell parent, CalendarEvent event) {
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -80,5 +81,11 @@ public class EventDetailsDialog extends Dialog {
 
 		event.setTitle(newTitle);
 		event.setDescription(newDescription);
+		
+		saved = true;
+	}
+	
+	public boolean wasSaved() {
+		return saved;
 	}
 }

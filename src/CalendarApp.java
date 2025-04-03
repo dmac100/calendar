@@ -81,6 +81,7 @@ public class CalendarApp {
 		// Create event table
 		eventTable = new EventTable(topComposite);
 		eventTable.setEvents(events);
+		eventTable.setEventChangeListener(e -> calendarCanvas.redraw());
 
 		// Create composite for the bottom section (calendar)
 		Composite bottomComposite = new Composite(sashForm, SWT.NONE);

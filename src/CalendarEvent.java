@@ -6,6 +6,9 @@ public class CalendarEvent {
 	private String description;
 	private boolean selected;
 
+	public CalendarEvent() {
+	}
+	
 	public CalendarEvent(LocalDate date, String title, String description) {
 		this.date = date;
 		this.title = title;

@@ -80,45 +80,7 @@ public class CalendarCanvas extends Canvas {
 			}
 		});
 
-		addListener(SWT.MouseDoubleClick, e -> {
-			Rectangle clientArea = getClientArea();
-			int cellWidth = clientArea.width / 7;
-			int cellHeight = (clientArea.height - CALENDAR_HEADER_HEIGHT) / 6;
-
-			int column = e.x / cellWidth;
-			int row = (e.y - CALENDAR_HEADER_HEIGHT) / cellHeight;
-
-			YearMonth yearMonth = YearMonth.from(currentDate);
-			LocalDate firstDay = yearMonth.atDay(1);
-			int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
-
-			int dayOfMonth = (row * 7 + column) - firstDayOfWeek + 1;
-
-			if (dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
-				LocalDate clickedDate = firstDay.plusDays(dayOfMonth - 1);
-
-				// Check if click was on an event
-				List<CalendarEvent> dayEvents = getEventsForDate(clickedDate);
-				if (!dayEvents.isEmpty()) {
-					// Calculate the y position within the cell
-					int yInCell = e.y - (row * cellHeight + CALENDAR_HEADER_HEIGHT);
-
-					// Check if click was in the event area
-					if (yInCell >= dayHeaderHeight) {
-						int eventIndex = (yInCell - dayHeaderHeight) / (eventHeight + 2);
-						if (eventIndex < dayEvents.size()) {
-							// Show event details dialog
-							CalendarEvent clickedEvent = dayEvents.get(eventIndex);
-							EventDetailsDialog dialog = new EventDetailsDialog(getShell(), clickedEvent);
-							dialog.open();
-
-							notifyListeners(SWT.Modify, new Event());
-							redraw();
-						}
-					}
-				}
-			}
-		});
+		addListener(SWT.MouseDoubleClick, e -> handleDoubleClick(e));
 	}
 
 	private void handleClick(Event e) {
@@ -165,6 +127,64 @@ public class CalendarCanvas extends Canvas {
 		}
 	}
 
+	private void handleDoubleClick(Event e) {
+		Rectangle clientArea = getClientArea();
+		int cellWidth = clientArea.width / 7;
+		int cellHeight = (clientArea.height - CALENDAR_HEADER_HEIGHT) / 6;
+
+		int column = e.x / cellWidth;
+		int row = (e.y - CALENDAR_HEADER_HEIGHT) / cellHeight;
+
+		YearMonth yearMonth = YearMonth.from(currentDate);
+		LocalDate firstDay = yearMonth.atDay(1);
+		int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
+
+		int dayOfMonth = (row * 7 + column) - firstDayOfWeek + 1;
+
+		if (dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
+			LocalDate clickedDate = firstDay.plusDays(dayOfMonth - 1);
+
+			// Check if click was on an event
+			List<CalendarEvent> dayEvents = getEventsForDate(clickedDate);
+			if (!dayEvents.isEmpty()) {
+				// Calculate the y position within the cell
+				int yInCell = e.y - (row * cellHeight + CALENDAR_HEADER_HEIGHT);
+
+				// Check if click was in the event area
+				if (yInCell >= dayHeaderHeight) {
+					int eventIndex = (yInCell - dayHeaderHeight) / (eventHeight + 2);
+					if (eventIndex < dayEvents.size()) {
+						// Show event details dialog
+						CalendarEvent clickedEvent = dayEvents.get(eventIndex);
+						EventDetailsDialog dialog = new EventDetailsDialog(getShell(), clickedEvent);
+						dialog.open();
+
+						notifyListeners(SWT.Modify, new Event());
+						redraw();
+						
+						return;
+					}
+				}
+			}
+			
+			CalendarEvent newEvent = new CalendarEvent();
+			newEvent.setDate(clickedDate);
+			newEvent.setDescription("");
+			newEvent.setSelected(true);
+			newEvent.setTitle("New Event");
+			
+			EventDetailsDialog dialog = new EventDetailsDialog(getShell(), newEvent);
+			dialog.open();
+			
+			if(dialog.wasSaved()) {
+				events.add(newEvent);
+				
+				notifyListeners(SWT.Modify, new Event());
+				redraw();
+			}
+		}
+	}
+	
 	private void deselectAllEvents() {
 		for (CalendarEvent event : events) {
 			if (event.isSelected()) {
