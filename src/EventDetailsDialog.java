@@ -71,25 +71,13 @@ public class EventDetailsDialog extends Dialog {
 		Composite startTimeComposite = new Composite(shell, SWT.NONE);
 		startTimeComposite.setLayout(new GridLayout(2, false));
 		startTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
-		Label hasEndLabel = new Label(shell, SWT.NONE);
-		hasEndLabel.setText("Has end time:");
-		hasEndLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
-		hasEndCheckbox = new Button(shell, SWT.CHECK);
-		hasEndCheckbox.setSelection(!event.isAllDay() && event.getEndTime() != null);
-		hasEndCheckbox.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				refreshEnabled();
-			}
-		});
 
 		Label endTimeLabel = new Label(shell, SWT.NONE);
 		endTimeLabel.setText("End time:");
 		endTimeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		Composite endTimeComposite = new Composite(shell, SWT.NONE);
-		endTimeComposite.setLayout(new GridLayout(2, false));
+		endTimeComposite.setLayout(new GridLayout(3, false));
 		endTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Start Time
@@ -97,6 +85,15 @@ public class EventDetailsDialog extends Dialog {
 		startMinuteCombo = new Combo(startTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		endHourCombo = new Combo(endTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		endMinuteCombo = new Combo(endTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+		hasEndCheckbox = new Button(endTimeComposite, SWT.CHECK);
+		hasEndCheckbox.setText("Has end time");
+		hasEndCheckbox.setSelection(!event.isAllDay() && event.getEndTime() != null);
+		hasEndCheckbox.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				refreshEnabled();
+			}
+		});
 
 		// Populate hour and minute combos
 		for (int i = 0; i < 24; i++) {
