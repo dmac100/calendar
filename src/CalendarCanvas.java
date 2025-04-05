@@ -71,9 +71,9 @@ public class CalendarCanvas extends Canvas {
 		addListener(SWT.MouseDown, e -> handleClick(e));
 
 		addListener(SWT.KeyDown, e -> {
-			if (e.keyCode == SWT.DEL) {
+			if(e.keyCode == SWT.DEL) {
 				CalendarEvent selectedEvent = getSelectedEvent();
-				if (selectedEvent != null) {
+				if(selectedEvent != null) {
 					events.remove(selectedEvent);
 					notifyListeners(SWT.Modify, new Event());
 					redraw();
@@ -98,7 +98,7 @@ public class CalendarCanvas extends Canvas {
 
 		int dayOfMonth = (row * 7 + column) - firstDayOfWeek + 1;
 
-		if (dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
+		if(dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
 			LocalDate clickedDate = firstDay.plusDays(dayOfMonth - 1);
 			selectedDate = clickedDate;
 
@@ -106,16 +106,16 @@ public class CalendarCanvas extends Canvas {
 
 			// Check if click was on an event
 			List<CalendarEvent> dayEvents = getEventsForDate(clickedDate);
-			if (!dayEvents.isEmpty()) {
+			if(!dayEvents.isEmpty()) {
 				// Calculate the y position within the cell
 				int yInCell = e.y - (row * cellHeight + CALENDAR_HEADER_HEIGHT);
 
 				// Check if click was in the event area
-				if (yInCell >= dayHeaderHeight) {
+				if(yInCell >= dayHeaderHeight) {
 					int eventIndex = (yInCell - dayHeaderHeight) / (eventHeight + 2);
-					if (eventIndex < dayEvents.size()) {
+					if(eventIndex < dayEvents.size()) {
 						// Deselect all events first
-						for (CalendarEvent event : events) {
+						for(CalendarEvent event:events) {
 							event.setSelected(false);
 						}
 						// Select the clicked event
@@ -142,19 +142,19 @@ public class CalendarCanvas extends Canvas {
 
 		int dayOfMonth = (row * 7 + column) - firstDayOfWeek + 1;
 
-		if (dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
+		if(dayOfMonth >= 1 && dayOfMonth <= yearMonth.lengthOfMonth()) {
 			LocalDate clickedDate = firstDay.plusDays(dayOfMonth - 1);
 
 			// Check if click was on an event
 			List<CalendarEvent> dayEvents = getEventsForDate(clickedDate);
-			if (!dayEvents.isEmpty()) {
+			if(!dayEvents.isEmpty()) {
 				// Calculate the y position within the cell
 				int yInCell = e.y - (row * cellHeight + CALENDAR_HEADER_HEIGHT);
 
 				// Check if click was in the event area
-				if (yInCell >= dayHeaderHeight) {
+				if(yInCell >= dayHeaderHeight) {
 					int eventIndex = (yInCell - dayHeaderHeight) / (eventHeight + 2);
-					if (eventIndex < dayEvents.size()) {
+					if(eventIndex < dayEvents.size()) {
 						// Show event details dialog
 						CalendarEvent clickedEvent = dayEvents.get(eventIndex);
 						EventDetailsDialog dialog = new EventDetailsDialog(getShell(), clickedEvent);
@@ -177,7 +177,7 @@ public class CalendarCanvas extends Canvas {
 			EventDetailsDialog dialog = new EventDetailsDialog(getShell(), newEvent);
 			dialog.open();
 
-			if (dialog.wasSaved()) {
+			if(dialog.wasSaved()) {
 				events.add(newEvent);
 
 				notifyListeners(SWT.Modify, new Event());
@@ -187,8 +187,8 @@ public class CalendarCanvas extends Canvas {
 	}
 
 	private void deselectAllEvents() {
-		for (CalendarEvent event : events) {
-			if (event.isSelected()) {
+		for(CalendarEvent event:events) {
+			if(event.isSelected()) {
 				event.setSelected(false);
 			}
 		}
@@ -211,7 +211,7 @@ public class CalendarCanvas extends Canvas {
 
 		// Draw header
 		String[] dayNames = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
-		for (int i = 0; i < 7; i++) {
+		for(int i = 0; i < 7; i++) {
 			int width = gc.textExtent(dayNames[i]).x;
 			gc.setBackground(COLOR_WIDGET_BACKGROUND);
 			gc.setForeground(COLOR_HEADER_TEXT);
@@ -227,19 +227,19 @@ public class CalendarCanvas extends Canvas {
 
 		// Draw day cells
 		int day = 1;
-		for (int i = 0; i < 6 && day <= daysInMonth; i++) {
-			for (int j = 0; j < 7; j++) {
+		for(int i = 0; i < 6 && day <= daysInMonth; i++) {
+			for(int j = 0; j < 7; j++) {
 				int x = (int) (j * cellWidth);
 				int y = (int) (i * cellHeight) + CALENDAR_HEADER_HEIGHT;
 
-				if (i == 0 && j < firstDayOfWeek)
+				if(i == 0 && j < firstDayOfWeek)
 					continue;
-				if (day > daysInMonth)
+				if(day > daysInMonth)
 					break;
 
 				LocalDate currentDay = firstDay.plusDays(day - 1);
 
-				if (currentDay.equals(selectedDate)) {
+				if(currentDay.equals(selectedDate)) {
 					gc.setBackground(COLOR_ORANGE_HIGHLIGHT);
 					gc.fillRectangle(x, y, (int) cellWidth + 1, (int) cellHeight + 1);
 
@@ -259,19 +259,19 @@ public class CalendarCanvas extends Canvas {
 
 				// Draw events for this day
 				List<CalendarEvent> dayEvents = getEventsForDate(currentDay);
-				if (!dayEvents.isEmpty()) {
+				if(!dayEvents.isEmpty()) {
 					gc.setClipping(x, y, (int) cellWidth, (int) cellHeight);
 
-					for (int eventIndex = 0; eventIndex < Math.min(dayEvents.size(), 2); eventIndex++) {
+					for(int eventIndex = 0; eventIndex < Math.min(dayEvents.size(), 2); eventIndex++) {
 						CalendarEvent event = dayEvents.get(eventIndex);
 						String text = event.getTitle();
-						if (event.getStartTime() != null) {
+						if(event.getStartTime() != null) {
 							text = event.getStartTime().toString() + " " + text;
 						}
 
 						gc.setBackground(COLOR_EVENT_BACKGROUND);
 						gc.setForeground(COLOR_EVENT_BORDER);
-						if (event.isSelected()) {
+						if(event.isSelected()) {
 							gc.setBackground(COLOR_EVENT_BACKGROUND_SELECTED);
 							gc.setForeground(COLOR_EVENT_BORDER_SELECTED);
 						}
@@ -295,14 +295,14 @@ public class CalendarCanvas extends Canvas {
 		gc.setForeground(COLOR_GRID);
 
 		// Draw vertical lines
-		for (int i = 0; i <= 7; i++) {
+		for(int i = 0; i <= 7; i++) {
 			int x = (int) (i * cellWidth);
 			gc.drawLine(x, 0, x, clientArea.height);
 		}
 
 		// Draw horizontal lines
 		gc.drawLine(0, 0, clientArea.width, 0);
-		for (int i = 0; i <= 6; i++) {
+		for(int i = 0; i <= 6; i++) {
 			int y = (int) (i * cellHeight);
 			gc.drawLine(0, CALENDAR_HEADER_HEIGHT + y, clientArea.width, CALENDAR_HEADER_HEIGHT + y);
 		}
@@ -310,8 +310,8 @@ public class CalendarCanvas extends Canvas {
 
 	private List<CalendarEvent> getEventsForDate(LocalDate date) {
 		List<CalendarEvent> dayEvents = new ArrayList<>();
-		for (CalendarEvent event : events) {
-			if (event.getDate().equals(date)) {
+		for(CalendarEvent event:events) {
+			if(event.getDate().equals(date)) {
 				dayEvents.add(event);
 			}
 		}
@@ -333,8 +333,8 @@ public class CalendarCanvas extends Canvas {
 	}
 
 	private CalendarEvent getSelectedEvent() {
-		for (CalendarEvent event : events) {
-			if (event.isSelected()) {
+		for(CalendarEvent event:events) {
+			if(event.isSelected()) {
 				return event;
 			}
 		}
@@ -343,7 +343,7 @@ public class CalendarCanvas extends Canvas {
 
 	@Override
 	public void dispose() {
-		if (boldFont != null) {
+		if(boldFont != null) {
 			boldFont.dispose();
 		}
 		super.dispose();

@@ -11,7 +11,7 @@ public class CalendarEvent {
 
 	public CalendarEvent() {
 	}
-	
+
 	public CalendarEvent(LocalDate date, String title, String description) {
 		this.date = date;
 		this.title = title;
@@ -49,7 +49,7 @@ public class CalendarEvent {
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-	
+
 	public LocalTime getStartTime() {
 		return startTime;
 	}
@@ -65,7 +65,7 @@ public class CalendarEvent {
 	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
-	
+
 	public boolean isAllDay() {
 		return (startTime == null);
 	}

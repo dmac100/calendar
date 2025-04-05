@@ -25,7 +25,7 @@ import net.fortuna.ical4j.util.UidGenerator;
 
 public class Cal4jHandler {
 	private static final String PROD_ID = "-//Calendar App//iCal4j 4.1.1//EN";
-	
+
 	public static void openFile(InputStream inputStream, List<CalendarEvent> events) throws IOException {
 		try {
 			CalendarBuilder builder = new CalendarBuilder();
@@ -35,26 +35,26 @@ public class Cal4jHandler {
 			for(Component component:calendar.getComponents()) {
 				if(component instanceof VEvent event) {
 					CalendarEvent calendarEvent = new CalendarEvent();
-					
+
 					calendarEvent.setTitle(event.getSummary().getValue());
 
 					event.getProperty(Property.DTSTART).ifPresent(startTime -> {
 						if(startTime instanceof DtStart dtStart) {
 							calendarEvent.setDate(LocalDate.from(dtStart.getDate()));
-							
+
 							if(dtStart.getDate().isSupported(ChronoField.HOUR_OF_DAY)) {
 								calendarEvent.setStartTime(LocalTime.from(dtStart.getDate()));
 							}
 						}
 					});
-					
+
 					event.getProperty(Property.DTEND).ifPresent(endTime -> {
 						if(endTime instanceof DtEnd dtEnd) {
 							calendarEvent.setDate(LocalDate.from(dtEnd.getDate()));
 							calendarEvent.setEndTime(LocalTime.from(dtEnd.getDate()));
 						}
 					});
-					
+
 					event.getProperty(Property.DESCRIPTION).ifPresent(description -> {
 						calendarEvent.setDescription(description.getValue());
 					});
@@ -71,9 +71,9 @@ public class Cal4jHandler {
 		Calendar calendar = new Calendar();
 		calendar.add(new ProdId(PROD_ID));
 		calendar.add(ImmutableVersion.VERSION_2_0);
-		
+
 		UidGenerator uidGenerator = new RandomUidGenerator();
-		
+
 		for(CalendarEvent event:events) {
 			VEvent vEvent;
 			if(event.getStartTime() != null && event.getEndTime() != null) {
@@ -93,9 +93,9 @@ public class Cal4jHandler {
 			if(event.getDescription() != null) {
 				vEvent.add(new Description(event.getDescription()));
 			}
-			
+
 			vEvent.add(uidGenerator.generateUid());
-			
+
 			calendar.add(vEvent);
 		}
 

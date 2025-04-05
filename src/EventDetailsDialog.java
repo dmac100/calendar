@@ -96,23 +96,23 @@ public class EventDetailsDialog extends Dialog {
 		});
 
 		// Populate hour and minute combos
-		for (int i = 0; i < 24; i++) {
+		for(int i = 0; i < 24; i++) {
 			String hour = String.format("%02d", i);
 			startHourCombo.add(hour);
 			endHourCombo.add(hour);
 		}
-		for (int i = 0; i < 60; i += 5) {
+		for(int i = 0; i < 60; i += 5) {
 			String minute = String.format("%02d", i);
 			startMinuteCombo.add(minute);
 			endMinuteCombo.add(minute);
 		}
 
 		// Set initial values
-		if (event.getStartTime() != null) {
+		if(event.getStartTime() != null) {
 			startHourCombo.setText(String.format("%02d", event.getStartTime().getHour()));
 			startMinuteCombo.setText(String.format("%02d", event.getStartTime().getMinute()));
 		}
-		if (event.getEndTime() != null) {
+		if(event.getEndTime() != null) {
 			endHourCombo.setText(String.format("%02d", event.getEndTime().getHour()));
 			endMinuteCombo.setText(String.format("%02d", event.getEndTime().getMinute()));
 		}
@@ -155,8 +155,8 @@ public class EventDetailsDialog extends Dialog {
 		shell.open();
 
 		Display display = parent.getDisplay();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
+		while(!shell.isDisposed()) {
+			if(!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
@@ -175,17 +175,17 @@ public class EventDetailsDialog extends Dialog {
 		event.setTitle(titleText.getText());
 		event.setDescription(descriptionText.getText());
 
-		if (allDayCheckbox.getSelection()) {
+		if(allDayCheckbox.getSelection()) {
 			event.setStartTime(null);
 			event.setEndTime(null);
 		} else {
-			if (startHourCombo.getText().length() > 0 && startMinuteCombo.getText().length() > 0) {
+			if(startHourCombo.getText().length() > 0 && startMinuteCombo.getText().length() > 0) {
 				int startHour = Integer.parseInt(startHourCombo.getText());
 				int startMinute = Integer.parseInt(startMinuteCombo.getText());
 				event.setStartTime(LocalTime.of(startHour, startMinute));
 			}
 
-			if (endHourCombo.getText().length() > 0 && endMinuteCombo.getText().length() > 0) {
+			if(endHourCombo.getText().length() > 0 && endMinuteCombo.getText().length() > 0) {
 				if(hasEndCheckbox.getSelection()) {
 					int endHour = Integer.parseInt(endHourCombo.getText());
 					int endMinute = Integer.parseInt(endMinuteCombo.getText());

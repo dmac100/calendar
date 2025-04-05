@@ -46,7 +46,7 @@ public class CalendarApp {
 		display = new Display();
 		shell = new Shell(display);
 		currentDate = LocalDate.now();
-		
+
 		shell.setText("SWT Calendar");
 		shell.setSize(1200, 800);
 		GridLayout shellLayout = new GridLayout(1, false);
@@ -111,7 +111,7 @@ public class CalendarApp {
 
 		// Add listener for event changes
 		calendarCanvas.addListener(SWT.Modify, e -> eventTable.updateEvents());
-		
+
 		calendarCanvas.addMouseWheelListener(e -> changeMonth((e.count > 0) ? -1 : 1));
 
 		// Set initial sash weights (20/80 split)
@@ -119,8 +119,8 @@ public class CalendarApp {
 
 		shell.open();
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
+		while(!shell.isDisposed()) {
+			if(!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
@@ -161,7 +161,7 @@ public class CalendarApp {
 		});
 
 		new MenuItem(fileMenu, SWT.SEPARATOR);
-		
+
 		MenuItem exitItem = new MenuItem(fileMenu, SWT.NONE);
 		exitItem.setText("Exit");
 		exitItem.addSelectionListener(new SelectionAdapter() {
@@ -172,16 +172,16 @@ public class CalendarApp {
 
 		shell.setMenuBar(menuBar);
 	}
-	
+
 	private void open() {
 		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 		dialog.setText("Open");
 		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
 		File path = new File(dialog.open());
-		if (path != null) {
+		if(path != null) {
 			try(InputStream inputStream = new FileInputStream(path)) {
 				Cal4jHandler.openFile(inputStream, events);
-			} catch (IOException e) {
+			} catch(IOException e) {
 				displayException(e);
 			}
 			openedPath = path;
@@ -189,34 +189,34 @@ public class CalendarApp {
 			calendarCanvas.redraw();
 		}
 	}
-	
+
 	private void save() {
 		if(openedPath == null) {
 			saveAs();
 		} else {
 			try(OutputStream outputStream = new FileOutputStream(openedPath)) {
 				Cal4jHandler.saveFile(outputStream, events);
-			} catch (IOException e) {
+			} catch(IOException e) {
 				displayException(e);
 			}
 		}
 	}
-	
+
 	private void saveAs() {
 		FileDialog dialog = new FileDialog(shell, SWT.SAVE);
 		dialog.setText("Save As");
 		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
 		String path = dialog.open();
-		if (path != null) {
+		if(path != null) {
 			try(OutputStream outputStream = new FileOutputStream(path)) {
 				Cal4jHandler.saveFile(outputStream, events);
-			} catch (IOException e) {
+			} catch(IOException e) {
 				displayException(e);
 			}
 			openedPath = new File(path);
 		}
 	}
-	
+
 	private void displayException(Exception e) {
 		MessageBox alert = new MessageBox(shell);
 		alert.setText("Error");

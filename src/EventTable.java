@@ -32,11 +32,11 @@ public class EventTable {
 		TableColumn startTimeColumn = new TableColumn(table, SWT.NONE);
 		startTimeColumn.setText("Start");
 		startTimeColumn.setWidth(200);
-		
+
 		TableColumn endTimeColumn = new TableColumn(table, SWT.NONE);
 		endTimeColumn.setText("End");
 		endTimeColumn.setWidth(200);
-		
+
 		TableColumn titleColumn = new TableColumn(table, SWT.NONE);
 		titleColumn.setText("Title");
 		titleColumn.setWidth(200);
@@ -47,11 +47,11 @@ public class EventTable {
 
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == SWT.DEL) {
+				if(e.keyCode == SWT.DEL) {
 					int[] selectionIndices = table.getSelectionIndices();
 					Arrays.sort(selectionIndices);
 
-					for (int selectionIndex = selectionIndices.length - 1; selectionIndex >= 0; selectionIndex--) {
+					for(int selectionIndex = selectionIndices.length - 1; selectionIndex >= 0; selectionIndex--) {
 						events.remove(selectionIndices[selectionIndex]);
 					}
 
@@ -60,23 +60,23 @@ public class EventTable {
 				}
 			}
 		});
-		
+
 		TableSorter.addSortHandlers(table, () -> {
 			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
 			TableSorter.sortBy(events, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
-			
+
 			updateEvents();
 		});
 	}
 
 	private String getField(CalendarEvent event, int index) {
 		return switch(index) {
-			case 0 -> event.getDate().format(DATE_FORMATTER);
-			case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
-			case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
-			case 3 -> event.getTitle();
-			case 4 -> event.getDescription();
-			default -> "";
+		case 0 -> event.getDate().format(DATE_FORMATTER);
+		case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
+		case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
+		case 3 -> event.getTitle();
+		case 4 -> event.getDescription();
+		default -> "";
 		};
 	}
 
@@ -90,19 +90,16 @@ public class EventTable {
 	}
 
 	public void updateEvents() {
-		if (events == null)
+		if(events == null)
 			return;
 
 		table.removeAll();
-		for (CalendarEvent event : events) {
+		for(CalendarEvent event:events) {
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(new String[] {
-				event.getDate().format(DATE_FORMATTER),
-				(event.getStartTime() != null ? event.getStartTime().toString() : ""),
-				(event.getEndTime() != null ? event.getEndTime().toString() : ""),
-				event.getTitle(),
-				event.getDescription()
-			});
+			item.setText(new String[] { event.getDate().format(DATE_FORMATTER),
+					(event.getStartTime() != null ? event.getStartTime().toString() : ""),
+					(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
+					event.getDescription() });
 		}
 	}
 
@@ -116,7 +113,7 @@ public class EventTable {
 		table.notifyListeners(SWT.Modify, event);
 
 		// Notify the canvas about the event change
-		if (eventChangeListener != null) {
+		if(eventChangeListener != null) {
 			eventChangeListener.handleEvent(event);
 		}
 	}

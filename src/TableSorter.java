@@ -12,10 +12,10 @@ class TableSorter {
 		table.setSortColumn(table.getColumn(0));
 		table.setSortDirection(SWT.UP);
 
-		for (var column : table.getColumns()) {
+		for(var column:table.getColumns()) {
 			column.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					if (table.getSortColumn() != column) {
+					if(table.getSortColumn() != column) {
 						table.setSortColumn(column);
 						table.setSortDirection(SWT.UP);
 					} else {
@@ -35,7 +35,7 @@ class TableSorter {
 			Double aDouble = getDouble(aText);
 			Double bDouble = getDouble(bText);
 
-			if (aDouble != null && bDouble != null) {
+			if(aDouble != null && bDouble != null) {
 				return Double.compare(aDouble, bDouble) * (sortUp ? 1 : -1);
 			} else {
 				return aText.compareToIgnoreCase(bText) * (sortUp ? 1 : -1);
@@ -46,7 +46,7 @@ class TableSorter {
 	private static Double getDouble(String text) {
 		try {
 			return Double.parseDouble(text);
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			return null;
 		}
 	}
