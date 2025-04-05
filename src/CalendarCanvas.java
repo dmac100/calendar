@@ -17,10 +17,13 @@ import org.eclipse.swt.widgets.Event;
 
 public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_WEEKEND_BACKGROUND = new Color(245, 245, 245);
+	private static final Color COLOR_NODAY_BACKGROUND = new Color(230, 230, 230);
 	private static final Color COLOR_GRID = new Color(200, 200, 200);
 	private static final Color COLOR_LIGHT_TEXT = new Color(100, 100, 100);
 	private static final Color COLOR_WHITE = new Color(255, 255, 255);
 	private static final Color COLOR_WIDGET_BACKGROUND = new Color(240, 240, 240);
+	private static final Color COLOR_HEADER_BACKGROUND = new Color(250, 250, 250);
+	private static final Color COLOR_WEEKEND_HEADER_BACKGROUND = new Color(240, 240, 240);
 	private static final Color COLOR_HEADER_TEXT = new Color(20, 20, 20);
 	private static final Color COLOR_ORANGE_HIGHLIGHT = new Color(255, 231, 156);
 	private static final Color COLOR_ORANGE_HIGHLIGHT_HEADER = new Color(247, 224, 147);
@@ -227,18 +230,24 @@ public class CalendarCanvas extends Canvas {
 
 		// Draw day cells
 		int day = 1;
-		for(int i = 0; i < 6 && day <= daysInMonth; i++) {
+		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 7; j++) {
 				int x = (int) (j * cellWidth);
 				int y = (int) (i * cellHeight) + CALENDAR_HEADER_HEIGHT;
 
-				if(i == 0 && j < firstDayOfWeek)
+				if(i == 0 && j < firstDayOfWeek || day > daysInMonth) {
+					gc.setBackground(COLOR_NODAY_BACKGROUND);
+					gc.fillRectangle(x, y, (int) cellWidth, (int) cellHeight);
 					continue;
-				if(day > daysInMonth)
-					break;
+				}
 
 				LocalDate currentDay = firstDay.plusDays(day - 1);
-
+				
+				// Draw day header
+				gc.setBackground((j == 0 || j == 6) ? COLOR_WEEKEND_HEADER_BACKGROUND : COLOR_HEADER_BACKGROUND);
+				gc.fillRectangle(x, y, (int) cellWidth + 1, (int) dayHeaderHeight);
+				
+				// Draw selected day
 				if(currentDay.equals(selectedDate)) {
 					gc.setBackground(COLOR_ORANGE_HIGHLIGHT);
 					gc.fillRectangle(x, y, (int) cellWidth + 1, (int) cellHeight + 1);
@@ -275,10 +284,8 @@ public class CalendarCanvas extends Canvas {
 							gc.setBackground(COLOR_EVENT_BACKGROUND_SELECTED);
 							gc.setForeground(COLOR_EVENT_BORDER_SELECTED);
 						}
-						gc.fillRectangle(x + 3, y + dayHeaderHeight + eventIndex * (eventHeight + 2),
-								(int) cellWidth - 4, eventHeight);
-						gc.drawRectangle(x + 3, y + dayHeaderHeight + eventIndex * (eventHeight + 2),
-								(int) cellWidth - 4, eventHeight);
+						gc.fillRectangle(x + 3, y + dayHeaderHeight + eventIndex * (eventHeight + 2), (int) cellWidth - 4, eventHeight);
+						gc.drawRectangle(x + 3, y + dayHeaderHeight + eventIndex * (eventHeight + 2), (int) cellWidth - 4, eventHeight);
 						gc.setForeground(COLOR_EVENT_TEXT);
 						gc.drawText(text, x + 5, y + dayHeaderHeight + eventIndex * (eventHeight + 2) + 1);
 					}
