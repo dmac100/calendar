@@ -1,11 +1,18 @@
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -14,13 +21,39 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 public class EventTable {
+	private static final String allEvents = "All Events";
+	private static final String eventsNextWeek = "Events in the next 7 days";
+	private static final String futureEvents = "Events in the future";
+	
 	private Table table;
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 	private List<CalendarEvent> events;
 	private Listener eventChangeListener;
-
+	private Combo filterCombo;
+	
 	public EventTable(Composite parent) {
-		table = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		Composite container = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.verticalSpacing = 1;
+		container.setLayout(layout);
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		filterCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		filterCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		filterCombo.add(allEvents);
+		filterCombo.add(eventsNextWeek);
+		filterCombo.add(futureEvents);
+		filterCombo.select(0);
+
+		filterCombo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateEvents();
+			}
+		});
+		
+		table = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -93,14 +126,35 @@ public class EventTable {
 
 		table.removeAll();
 		for(CalendarEvent event:events) {
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(new String[] {
-				event.getDate().format(DATE_FORMATTER),
-				(event.getStartTime() != null ? event.getStartTime().toString() : ""),
-				(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
-				event.getDescription()
-			});
+			if(showEvent(event)) {
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(new String[] {
+					event.getDate().format(DATE_FORMATTER),
+					(event.getStartTime() != null ? event.getStartTime().toString() : ""),
+					(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
+					event.getDescription()
+				});
+			}
 		}
+	}
+
+	private boolean showEvent(CalendarEvent event) {
+		if(Set.of(futureEvents, eventsNextWeek).contains(filterCombo.getText())) {
+			 if(event.getDate().isBefore(LocalDate.now())) {
+				 return false;
+			 } else if(event.getDate().isEqual(LocalDate.now())) {
+				 if(event.getStartTime() != null && event.getStartTime().isBefore(LocalTime.now())) {
+					 return false;
+				 }
+			 }
+			 
+			 if(filterCombo.getText().equals(eventsNextWeek)) {
+				 if(event.getDate().isAfter(LocalDate.now().plusDays(7))) {
+					 return false;
+				 }
+			 }
+		}
+		return true;
 	}
 
 	public Table getTable() {
