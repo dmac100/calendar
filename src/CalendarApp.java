@@ -32,7 +32,6 @@ public class CalendarApp {
 	
 	private static String title = "Calendar";
 
-	private Display display;
 	private Shell shell;
 	private Label monthLabel;
 	private LocalDate selectedDate;
@@ -44,9 +43,8 @@ public class CalendarApp {
 
 	private File openedPath;
 
-	public CalendarApp() {
-		display = new Display();
-		shell = new Shell(display);
+	public CalendarApp(Shell shell) {
+		this.shell = shell;
 		selectedDate = LocalDate.now();
 
 		shell.setText(title);
@@ -120,13 +118,6 @@ public class CalendarApp {
 		sashForm.setWeights(new int[] { 20, 80 });
 
 		shell.open();
-
-		while(!shell.isDisposed()) {
-			if(!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		display.dispose();
 	}
 
 	private void createMenuBar() {
@@ -199,9 +190,9 @@ public class CalendarApp {
 		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 		dialog.setText("Open");
 		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
-		File path = new File(dialog.open());
+		String path = dialog.open();
 		if(path != null) {
-			open(path);
+			open(new File(path));
 		}
 	}
 	
@@ -214,7 +205,7 @@ public class CalendarApp {
 			}
 		}
 		openedPath = path;
-		shell.setText(title + " - " + openedPath);
+		shell.setText(title + " - " + path.getAbsolutePath());
 		eventTable.updateEvents();
 		calendarCanvas.redraw();
 	}
@@ -243,7 +234,7 @@ public class CalendarApp {
 				displayException(e);
 			}
 			openedPath = new File(path);
-			shell.setText(title + " - " + openedPath);
+			shell.setText(title + " - " + openedPath.getAbsolutePath());
 		}
 	}
 
@@ -266,9 +257,19 @@ public class CalendarApp {
 	}
 
 	public static void main(String[] args) {
-		CalendarApp calendarApp = new CalendarApp();
+		Display display = new Display();
+		Shell shell = new Shell(display);
+		
+		CalendarApp calendarApp = new CalendarApp(shell);
 		if(args.length == 1) {
 			calendarApp.open(new File(args[0]));
 		}
+		
+		while(!shell.isDisposed()) {
+			if(!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		display.dispose();
 	}
 }
