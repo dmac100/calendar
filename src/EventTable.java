@@ -24,7 +24,6 @@ public class EventTable {
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		// Add columns to the table
 		TableColumn dateColumn = new TableColumn(table, SWT.NONE);
 		dateColumn.setText("Date");
 		dateColumn.setWidth(100);
@@ -71,12 +70,12 @@ public class EventTable {
 
 	private String getField(CalendarEvent event, int index) {
 		return switch(index) {
-		case 0 -> event.getDate().format(DATE_FORMATTER);
-		case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
-		case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
-		case 3 -> event.getTitle();
-		case 4 -> event.getDescription();
-		default -> "";
+			case 0 -> event.getDate().format(DATE_FORMATTER);
+			case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
+			case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
+			case 3 -> event.getTitle();
+			case 4 -> event.getDescription();
+			default -> "";
 		};
 	}
 
@@ -90,16 +89,17 @@ public class EventTable {
 	}
 
 	public void updateEvents() {
-		if(events == null)
-			return;
+		if(events == null) return;
 
 		table.removeAll();
 		for(CalendarEvent event:events) {
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(new String[] { event.getDate().format(DATE_FORMATTER),
-					(event.getStartTime() != null ? event.getStartTime().toString() : ""),
-					(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
-					event.getDescription() });
+			item.setText(new String[] {
+				event.getDate().format(DATE_FORMATTER),
+				(event.getStartTime() != null ? event.getStartTime().toString() : ""),
+				(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
+				event.getDescription()
+			});
 		}
 	}
 
@@ -112,7 +112,6 @@ public class EventTable {
 		event.widget = table;
 		table.notifyListeners(SWT.Modify, event);
 
-		// Notify the canvas about the event change
 		if(eventChangeListener != null) {
 			eventChangeListener.handleEvent(event);
 		}
