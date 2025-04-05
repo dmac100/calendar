@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
+import java.time.temporal.Temporal;
 import java.util.List;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -41,7 +41,6 @@ public class Cal4jHandler {
 					event.getProperty(Property.DTSTART).ifPresent(startTime -> {
 						if(startTime instanceof DtStart dtStart) {
 							calendarEvent.setDate(LocalDate.from(dtStart.getDate()));
-
 							if(dtStart.getDate().isSupported(ChronoField.HOUR_OF_DAY)) {
 								calendarEvent.setStartTime(LocalTime.from(dtStart.getDate()));
 							}
@@ -50,8 +49,10 @@ public class Cal4jHandler {
 
 					event.getProperty(Property.DTEND).ifPresent(endTime -> {
 						if(endTime instanceof DtEnd dtEnd) {
-							calendarEvent.setDate(LocalDate.from(dtEnd.getDate()));
-							calendarEvent.setEndTime(LocalTime.from(dtEnd.getDate()));
+							calendarEvent.setEndDate(LocalDate.from(dtEnd.getDate()));
+							if(dtEnd.getDate().isSupported(ChronoField.HOUR_OF_DAY)) {
+								calendarEvent.setEndTime(LocalTime.from(dtEnd.getDate()));
+							}
 						}
 					});
 
@@ -76,15 +77,14 @@ public class Cal4jHandler {
 
 		for(CalendarEvent event:events) {
 			VEvent vEvent;
-			if(event.getStartTime() != null && event.getEndTime() != null) {
-				LocalDateTime start = LocalDateTime.of(event.getDate(), event.getStartTime());
-				LocalDateTime end = LocalDateTime.of(event.getDate(), event.getEndTime());
+			
+			Temporal start = getTemporal(event.getDate(), event.getStartTime());
+			Temporal end = getTemporal(event.getEndDate(), event.getEndTime());
+			
+			if(start != null && end != null) {
 				vEvent = new VEvent(start, end, event.getTitle());
-			} else if(event.getStartTime() != null) {
-				LocalDateTime start = LocalDateTime.of(event.getDate(), event.getStartTime());
+			} else if(start != null) {
 				vEvent = new VEvent(start, event.getTitle());
-			} else if(event.getDate() != null) {
-				vEvent = new VEvent(event.getDate(), event.getTitle());
 			} else {
 				System.err.println("Skipping event with no date: " + event);
 				continue;
@@ -101,5 +101,15 @@ public class Cal4jHandler {
 
 		CalendarOutputter outputter = new CalendarOutputter();
 		outputter.output(calendar, outputStream);
+	}
+
+	private static Temporal getTemporal(LocalDate date, LocalTime time) {
+		if(time == null) {
+			return date;
+		} else if(date == null) {
+			return null;
+		} else {
+			return LocalDateTime.of(date, time);
+		}
 	}
 }

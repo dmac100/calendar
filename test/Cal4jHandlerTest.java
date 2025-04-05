@@ -38,6 +38,7 @@ public class Cal4jHandlerTest {
 		event.setTitle("Title");
 		event.setDescription("Description");
 		event.setDate(LocalDate.of(2000, 1, 1));
+		event.setEndDate(LocalDate.of(2000, 2, 1));
 		event.setStartTime(LocalTime.of(14, 0));
 		event.setEndTime(LocalTime.of(15, 0));
 		events.add(event);
@@ -50,6 +51,8 @@ public class Cal4jHandlerTest {
 		
 		assertEquals("Title", events.get(0).getTitle());
 		assertEquals("Description", events.get(0).getDescription());
+		assertEquals(LocalDate.of(2000, 1, 1), events.get(0).getDate());
+		assertEquals(LocalDate.of(2000, 2, 1), events.get(0).getEndDate());
 		assertEquals(LocalTime.of(14, 0), events.get(0).getStartTime());
 		assertEquals(LocalTime.of(15, 0), events.get(0).getEndTime());
 	}

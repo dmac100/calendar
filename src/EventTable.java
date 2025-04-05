@@ -9,6 +9,9 @@ import java.util.Set;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -99,20 +102,33 @@ public class EventTable {
 				}
 			}
 		});
+		
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseDoubleClick(MouseEvent event) {
+				int selectedIndex = table.getSelectionIndex();
+				if(selectedIndex >= 0) {
+					EventDetailsDialog dialog = new EventDetailsDialog(table.getShell(), events.get(selectedIndex));
+					dialog.open();
+					
+					updateEvents();
+				}
+			}
+		});
 
 		TableSorter.addSortHandlers(table, () -> {
 			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
 			TableSorter.sortBy(events, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
 
 			updateEvents();
+			notifyListeners();
 		});
 	}
 
 	private String getField(CalendarEvent event, int index) {
 		return switch(index) {
 			case 0 -> event.getDate().format(DATE_FORMATTER);
-			case 1 -> event.getStartTime() == null ? "" : String.valueOf(event.getStartTime());
-			case 2 -> event.getEndTime() == null ? "" : String.valueOf(event.getEndTime());
+			case 1 -> formatDate(event.getDate(), event.getStartTime());
+			case 2 -> formatDate(event.getEndDate(), event.getEndTime());
 			case 3 -> event.getTitle();
 			case 4 -> event.getDescription();
 			default -> "";
@@ -137,11 +153,22 @@ public class EventTable {
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(new String[] {
 					event.getDate().format(DATE_FORMATTER),
-					(event.getStartTime() != null ? event.getStartTime().toString() : ""),
-					(event.getEndTime() != null ? event.getEndTime().toString() : ""), event.getTitle(),
+					formatDate(event.getDate(), event.getStartTime()),
+					formatDate(event.getEndDate(), event.getEndTime()),
+					event.getTitle(),
 					event.getDescription()
 				});
 			}
+		}
+	}
+
+	private static String formatDate(LocalDate date, LocalTime time) {
+		if(date == null) {
+			return "";
+		} else if(time == null) {
+			return String.valueOf(date);
+		} else {
+			return String.valueOf(date) + " " + String.valueOf(time);
 		}
 	}
 

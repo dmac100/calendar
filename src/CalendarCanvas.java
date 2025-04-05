@@ -1,6 +1,9 @@
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -275,10 +278,10 @@ public class CalendarCanvas extends Canvas {
 				if(!dayEvents.isEmpty()) {
 					gc.setClipping(x, y, (int) cellWidth, (int) cellHeight);
 
-					for(int eventIndex = 0; eventIndex < Math.min(dayEvents.size(), 2); eventIndex++) {
+					for(int eventIndex = 0; eventIndex < dayEvents.size(); eventIndex++) {
 						CalendarEvent event = dayEvents.get(eventIndex);
 						String text = event.getTitle();
-						if(event.getStartTime() != null) {
+						if(event.getStartTime() != null && event.getDate().equals(currentDay)) {
 							text = event.getStartTime().toString() + " " + text;
 						}
 
@@ -322,10 +325,20 @@ public class CalendarCanvas extends Canvas {
 	private List<CalendarEvent> getEventsForDate(LocalDate date) {
 		List<CalendarEvent> dayEvents = new ArrayList<>();
 		for(CalendarEvent event:events) {
-			if(event.getDate().equals(date)) {
-				dayEvents.add(event);
+			if(event.hasEnd()) {
+				if(!event.getDate().isAfter(date) && !event.getEndDate().isBefore(date)) {
+					dayEvents.add(event);
+				}
+			} else {
+				if(event.getDate().equals(date)) {
+					dayEvents.add(event);
+				}
 			}
 		}
+		Collections.sort(dayEvents,
+			Comparator.comparing((CalendarEvent event) -> !event.isAllDay()).
+				thenComparing((CalendarEvent event) -> (event.getStartTime() == null) ? LocalTime.of(0, 0) : event.getStartTime())
+		);
 		return dayEvents;
 	}
 

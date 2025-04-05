@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.eclipse.swt.SWT;
@@ -8,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -19,6 +21,8 @@ public class EventDetailsDialog extends Dialog {
 	private boolean changesSaved = false;
 	private Text titleText;
 	private Text descriptionText;
+	private DateTime startDate;
+	private DateTime endDate;
 	private Combo startHourCombo;
 	private Combo startMinuteCombo;
 	private Combo endHourCombo;
@@ -41,53 +45,57 @@ public class EventDetailsDialog extends Dialog {
 		shell.setText("Event Details");
 		shell.setLayout(new GridLayout(2, false));
 
-		// Title
 		Label titleLabel = new Label(shell, SWT.NONE);
 		titleLabel.setText("Title:");
 		titleLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		titleText = new Text(shell, SWT.BORDER);
-		titleText.setText(event.getTitle());
 		titleText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		// All day event
-		Label allDayLabel = new Label(shell, SWT.NONE);
-		allDayLabel.setText("All day event:");
-		allDayLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
-		allDayCheckbox = new Button(shell, SWT.CHECK);
-		allDayCheckbox.setSelection(event.isAllDay());
+		Label startDateLabel = new Label(shell, SWT.NONE);
+		startDateLabel.setText("Start date:");
+		startDateLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		
+		GridLayout startDateLayout = new GridLayout(4, false);
+		startDateLayout.marginWidth = 0;
+		startDateLayout.marginHeight = 0;
+		
+		Composite startDateComposite = new Composite(shell, SWT.NONE);
+		startDateComposite.setLayout(startDateLayout);
+		startDateComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		startDate = new DateTime(startDateComposite, SWT.DROP_DOWN);
+		
+		startHourCombo = new Combo(startDateComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		startMinuteCombo = new Combo(startDateComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		
+		allDayCheckbox = new Button(startDateComposite, SWT.CHECK);
+		allDayCheckbox.setText("All day event");
 		allDayCheckbox.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				refreshEnabled();
 			}
 		});
-
-		// Time Selection
-		Label startTimeLabel = new Label(shell, SWT.NONE);
-		startTimeLabel.setText("Start time:");
-		startTimeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
-		Composite startTimeComposite = new Composite(shell, SWT.NONE);
-		startTimeComposite.setLayout(new GridLayout(2, false));
-		startTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		Label endTimeLabel = new Label(shell, SWT.NONE);
-		endTimeLabel.setText("End time:");
-		endTimeLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
-		Composite endTimeComposite = new Composite(shell, SWT.NONE);
-		endTimeComposite.setLayout(new GridLayout(3, false));
-		endTimeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		// Start Time
-		startHourCombo = new Combo(startTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		startMinuteCombo = new Combo(startTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		endHourCombo = new Combo(endTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		endMinuteCombo = new Combo(endTimeComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-		hasEndCheckbox = new Button(endTimeComposite, SWT.CHECK);
-		hasEndCheckbox.setText("Has end time");
+		
+		Label endDateLabel = new Label(shell, SWT.NONE);
+		endDateLabel.setText("End date:");
+		endDateLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		
+		GridLayout endDateLayout = new GridLayout(4, false);
+		endDateLayout.marginWidth = 0;
+		endDateLayout.marginHeight = 0;
+		
+		Composite endDateComposite = new Composite(shell, SWT.NONE);
+		endDateComposite.setLayout(endDateLayout);
+		endDateComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		endDate = new DateTime(endDateComposite, SWT.DROP_DOWN);
+		
+		endHourCombo = new Combo(endDateComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		endMinuteCombo = new Combo(endDateComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		
+		hasEndCheckbox = new Button(endDateComposite, SWT.CHECK);
+		hasEndCheckbox.setText("Has end");
 		hasEndCheckbox.setSelection(!event.isAllDay() && event.getEndTime() != null);
 		hasEndCheckbox.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -107,26 +115,13 @@ public class EventDetailsDialog extends Dialog {
 			endMinuteCombo.add(minute);
 		}
 
-		// Set initial values
-		if(event.getStartTime() != null) {
-			startHourCombo.setText(String.format("%02d", event.getStartTime().getHour()));
-			startMinuteCombo.setText(String.format("%02d", event.getStartTime().getMinute()));
-		}
-		if(event.getEndTime() != null) {
-			endHourCombo.setText(String.format("%02d", event.getEndTime().getHour()));
-			endMinuteCombo.setText(String.format("%02d", event.getEndTime().getMinute()));
-		}
-
-		// Description
 		Label descriptionLabel = new Label(shell, SWT.NONE);
 		descriptionLabel.setText("Description:");
 		descriptionLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
 
 		descriptionText = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-		descriptionText.setText(event.getDescription());
 		descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
 
-		// Buttons
 		Composite buttonComposite = new Composite(shell, SWT.NONE);
 		buttonComposite.setLayout(new GridLayout(2, true));
 		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -139,19 +134,19 @@ public class EventDetailsDialog extends Dialog {
 		cancelButton.setText("Cancel");
 		cancelButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		// Save button handler
 		saveButton.addListener(SWT.Selection, e -> {
 			saveChanges();
 			shell.close();
 		});
 
-		// Cancel button handler
 		cancelButton.addListener(SWT.Selection, e -> shell.close());
+		
+		setEvent(event);
 
 		refreshEnabled();
 
 		shell.pack();
-		shell.setSize(500, 450);
+		shell.setSize(550, 500);
 		shell.open();
 
 		Display display = parent.getDisplay();
@@ -162,6 +157,37 @@ public class EventDetailsDialog extends Dialog {
 		}
 	}
 
+	private void setEvent(CalendarEvent event) {
+		titleText.setText(event.getTitle());
+		
+		descriptionText.setText(event.getDescription());
+		
+		if(event.getDate() != null) {
+			startDate.setDate(event.getDate().getYear(), event.getDate().getMonthValue() - 1, event.getDate().getDayOfMonth());
+		}
+		
+		if(event.getEndDate() == null) {
+			if(event.getDate() != null) {
+				endDate.setDate(event.getDate().getYear(), event.getDate().getMonthValue() - 1, event.getDate().getDayOfMonth());
+			}
+		} else {
+			endDate.setDate(event.getEndDate().getYear(), event.getEndDate().getMonthValue() - 1, event.getEndDate().getDayOfMonth());
+		}
+		
+		if(event.getStartTime() != null) {
+			startHourCombo.setText(String.format("%02d", event.getStartTime().getHour()));
+			startMinuteCombo.setText(String.format("%02d", event.getStartTime().getMinute()));
+		}
+		
+		if(event.getEndTime() != null) {
+			endHourCombo.setText(String.format("%02d", event.getEndTime().getHour()));
+			endMinuteCombo.setText(String.format("%02d", event.getEndTime().getMinute()));
+		}
+		
+		allDayCheckbox.setSelection(event.isAllDay());
+		hasEndCheckbox.setSelection(event.hasEnd());
+	}
+
 	private void refreshEnabled() {
 		boolean allDay = allDayCheckbox.getSelection();
 		boolean hasEnd = hasEndCheckbox.getSelection();
@@ -169,6 +195,20 @@ public class EventDetailsDialog extends Dialog {
 		startMinuteCombo.setEnabled(!allDay);
 		endHourCombo.setEnabled(!allDay && hasEnd);
 		endMinuteCombo.setEnabled(!allDay && hasEnd);
+		endDate.setEnabled(hasEnd);
+		
+		if(startHourCombo.getText().isEmpty() && startHourCombo.isEnabled()) {
+			startHourCombo.setText("00");
+		}
+		if(endHourCombo.getText().isEmpty() && endHourCombo.isEnabled()) {
+			endHourCombo.setText(startHourCombo.getText());
+		}
+		if(startMinuteCombo.getText().isEmpty() && startMinuteCombo.isEnabled()) {
+			startMinuteCombo.setText("00");
+		}
+		if(endMinuteCombo.getText().isEmpty() && endMinuteCombo.isEnabled()) {
+			endMinuteCombo.setText(startMinuteCombo.getText());
+		}
 	}
 
 	private void saveChanges() {
@@ -183,6 +223,8 @@ public class EventDetailsDialog extends Dialog {
 				int startHour = Integer.parseInt(startHourCombo.getText());
 				int startMinute = Integer.parseInt(startMinuteCombo.getText());
 				event.setStartTime(LocalTime.of(startHour, startMinute));
+			} else {
+				event.setStartTime(LocalTime.of(0, 0));
 			}
 
 			if(endHourCombo.getText().length() > 0 && endMinuteCombo.getText().length() > 0) {
@@ -193,7 +235,22 @@ public class EventDetailsDialog extends Dialog {
 				} else {
 					event.setEndTime(null);
 				}
+			} else {
+				if(hasEndCheckbox.getSelection()) {
+					event.setEndTime(LocalTime.of(23, 55));
+				}
 			}
+		}
+		
+		event.setDate(LocalDate.of(startDate.getYear(), startDate.getMonth() + 1, startDate.getDay()));
+		
+		if(hasEndCheckbox.getSelection()) {
+			event.setEndDate(LocalDate.of(endDate.getYear(), endDate.getMonth() + 1, endDate.getDay()));
+			if(event.getEndDate().isBefore(event.getDate())) {
+				event.setEndDate(event.getDate());
+			}
+		} else {
+			event.setEndDate(null);
 		}
 
 		changesSaved = true;

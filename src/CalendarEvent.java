@@ -3,6 +3,7 @@ import java.time.LocalTime;
 
 public class CalendarEvent {
 	private LocalDate date;
+	private LocalDate endDate;
 	private String title;
 	private String description;
 	private boolean selected;
@@ -68,5 +69,17 @@ public class CalendarEvent {
 
 	public boolean isAllDay() {
 		return (startTime == null);
+	}
+	
+	public boolean hasEnd() {
+		return (endDate != null);
+	}
+
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+	
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
 	}
 }
