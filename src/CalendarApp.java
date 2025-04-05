@@ -136,24 +136,27 @@ public class CalendarApp {
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuItem.setMenu(fileMenu);
 
-		MenuItem openItem = new MenuItem(fileMenu, SWT.NONE);
-		openItem.setText("Open...");
+		MenuItem openItem = new MenuItem(fileMenu, SWT.PUSH);
+		openItem.setText("&Open...\tCtrl+O");
+		openItem.setAccelerator(SWT.CTRL | 'O');
 		openItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				open();
 			}
 		});
 
-		MenuItem saveItem = new MenuItem(fileMenu, SWT.NONE);
-		saveItem.setText("Save");
+		MenuItem saveItem = new MenuItem(fileMenu, SWT.PUSH);
+		saveItem.setText("&Save\tCtrl+S");
+		saveItem.setAccelerator(SWT.CTRL | 'S');
 		saveItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				save();
 			}
 		});
 
-		MenuItem saveAsItem = new MenuItem(fileMenu, SWT.NONE);
-		saveAsItem.setText("Save As...");
+		MenuItem saveAsItem = new MenuItem(fileMenu, SWT.PUSH);
+		saveAsItem.setText("Save &As...\tShift+Ctrl+S");
+		saveItem.setAccelerator(SWT.CTRL | SWT.SHIFT | 'S');
 		saveAsItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				saveAs();
