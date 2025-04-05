@@ -69,9 +69,4 @@ public class CalendarEvent {
 	public boolean isAllDay() {
 		return (startTime == null);
 	}
-
-	@Override
-	public String toString() {
-		return title;
-	}
 }

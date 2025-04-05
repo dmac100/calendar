@@ -1,5 +1,10 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +19,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class CalendarApp {
@@ -33,13 +40,13 @@ public class CalendarApp {
 
 	private List<CalendarEvent> events = new ArrayList<>();
 
+	private File openedPath;
+
 	public CalendarApp() {
 		display = new Display();
 		shell = new Shell(display);
 		currentDate = LocalDate.now();
-	}
-
-	public void open() {
+		
 		shell.setText("SWT Calendar");
 		shell.setSize(1200, 800);
 		GridLayout shellLayout = new GridLayout(1, false);
@@ -110,9 +117,6 @@ public class CalendarApp {
 		// Set initial sash weights (20/80 split)
 		sashForm.setWeights(new int[] { 20, 80 });
 
-		// Add some sample events
-		addSampleEvents();
-
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -132,9 +136,34 @@ public class CalendarApp {
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileMenuItem.setMenu(fileMenu);
 
+		MenuItem openItem = new MenuItem(fileMenu, SWT.NONE);
+		openItem.setText("Open...");
+		openItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				open();
+			}
+		});
+
+		MenuItem saveItem = new MenuItem(fileMenu, SWT.NONE);
+		saveItem.setText("Save");
+		saveItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				save();
+			}
+		});
+
+		MenuItem saveAsItem = new MenuItem(fileMenu, SWT.NONE);
+		saveAsItem.setText("Save As...");
+		saveAsItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveAs();
+			}
+		});
+
+		new MenuItem(fileMenu, SWT.SEPARATOR);
+		
 		MenuItem exitItem = new MenuItem(fileMenu, SWT.NONE);
 		exitItem.setText("Exit");
-
 		exitItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				System.exit(0);
@@ -143,16 +172,57 @@ public class CalendarApp {
 
 		shell.setMenuBar(menuBar);
 	}
-
-	private void addSampleEvents() {
-		// Add some sample events
-		events.add(new CalendarEvent(LocalDate.of(2025, 4, 1), "Team Meeting", "Weekly team sync"));
-		events.add(new CalendarEvent(LocalDate.of(2025, 4, 1), "Lunch with Client", "Discuss project requirements"));
-		events.add(new CalendarEvent(LocalDate.of(2025, 4, 4), "Doctor Appointment", "Annual checkup"));
-
-		events.get(0).setStartTime(LocalTime.of(14, 0));
-
-		eventTable.updateEvents();
+	
+	private void open() {
+		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		dialog.setText("Open");
+		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
+		File path = new File(dialog.open());
+		if (path != null) {
+			try(InputStream inputStream = new FileInputStream(path)) {
+				Cal4jHandler.openFile(inputStream, events);
+			} catch (IOException e) {
+				displayException(e);
+			}
+			openedPath = path;
+			eventTable.updateEvents();
+			calendarCanvas.redraw();
+		}
+	}
+	
+	private void save() {
+		if(openedPath == null) {
+			saveAs();
+		} else {
+			try(OutputStream outputStream = new FileOutputStream(openedPath)) {
+				Cal4jHandler.saveFile(outputStream, events);
+			} catch (IOException e) {
+				displayException(e);
+			}
+		}
+	}
+	
+	private void saveAs() {
+		FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+		dialog.setText("Save As");
+		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
+		String path = dialog.open();
+		if (path != null) {
+			try(OutputStream outputStream = new FileOutputStream(path)) {
+				Cal4jHandler.saveFile(outputStream, events);
+			} catch (IOException e) {
+				displayException(e);
+			}
+			openedPath = new File(path);
+		}
+	}
+	
+	private void displayException(Exception e) {
+		MessageBox alert = new MessageBox(shell);
+		alert.setText("Error");
+		alert.setMessage((e.getMessage() == null) ? "Unknown error" : e.getMessage());
+		e.printStackTrace();
+		alert.open();
 	}
 
 	private void updateMonthLabel() {
@@ -166,6 +236,6 @@ public class CalendarApp {
 	}
 
 	public static void main(String[] args) {
-		new CalendarApp().open();
+		new CalendarApp();
 	}
 }
