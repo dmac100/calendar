@@ -33,7 +33,7 @@ public class CalendarApp {
 	private Display display;
 	private Shell shell;
 	private Label monthLabel;
-	private LocalDate currentDate;
+	private LocalDate selectedDate;
 	private CalendarCanvas calendarCanvas;
 	private EventTable eventTable;
 	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
@@ -45,7 +45,7 @@ public class CalendarApp {
 	public CalendarApp() {
 		display = new Display();
 		shell = new Shell(display);
-		currentDate = LocalDate.now();
+		selectedDate = LocalDate.now();
 
 		shell.setText("SWT Calendar");
 		shell.setSize(1200, 800);
@@ -106,7 +106,7 @@ public class CalendarApp {
 		updateMonthLabel();
 
 		// Create calendar canvas
-		calendarCanvas = new CalendarCanvas(bottomComposite, currentDate, events);
+		calendarCanvas = new CalendarCanvas(bottomComposite, selectedDate, events);
 		calendarCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Add listener for event changes
@@ -172,6 +172,23 @@ public class CalendarApp {
 				System.exit(0);
 			}
 		});
+		
+		MenuItem goItem = new MenuItem(menuBar, SWT.CASCADE);
+		goItem.setText("&Go");
+		Menu goMenu = new Menu(shell, SWT.DROP_DOWN);
+		goItem.setMenu(goMenu);
+
+		MenuItem goToTodayItem = new MenuItem(goMenu, SWT.PUSH);
+		goToTodayItem.setText("Go to &Today\tCtrl+T");
+		goToTodayItem.setAccelerator(SWT.CTRL + 'T');
+		goToTodayItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				selectedDate = LocalDate.now();
+				updateMonthLabel();
+				calendarCanvas.setCurrentDate(selectedDate);
+				calendarCanvas.redraw();
+			}
+		});
 
 		shell.setMenuBar(menuBar);
 	}
@@ -229,13 +246,13 @@ public class CalendarApp {
 	}
 
 	private void updateMonthLabel() {
-		monthLabel.setText(currentDate.format(MONTH_FORMATTER));
+		monthLabel.setText(selectedDate.format(MONTH_FORMATTER));
 	}
 
 	private void changeMonth(int delta) {
-		currentDate = currentDate.plusMonths(delta);
+		selectedDate = selectedDate.plusMonths(delta);
 		updateMonthLabel();
-		calendarCanvas.setCurrentDate(currentDate);
+		calendarCanvas.setCurrentDate(selectedDate);
 	}
 
 	public static void main(String[] args) {

@@ -36,16 +36,14 @@ public class CalendarCanvas extends Canvas {
 
 	private Font normalFont;
 	private Font boldFont;
-	private LocalDate currentDate;
 	private LocalDate selectedDate;
 	private List<CalendarEvent> events;
 	private int eventHeight = 18;
 	private int dayHeaderHeight = 20;
 
-	public CalendarCanvas(Composite parent, LocalDate currentDate, List<CalendarEvent> events) {
+	public CalendarCanvas(Composite parent, LocalDate selectedDate, List<CalendarEvent> events) {
 		super(parent, SWT.DOUBLE_BUFFERED);
-		this.currentDate = currentDate;
-		this.selectedDate = currentDate;
+		this.selectedDate = selectedDate;
 		this.events = events;
 
 		loadFonts();
@@ -95,7 +93,7 @@ public class CalendarCanvas extends Canvas {
 		int column = e.x / cellWidth;
 		int row = (e.y - CALENDAR_HEADER_HEIGHT) / cellHeight;
 
-		YearMonth yearMonth = YearMonth.from(currentDate);
+		YearMonth yearMonth = YearMonth.from(selectedDate);
 		LocalDate firstDay = yearMonth.atDay(1);
 		int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
 
@@ -139,7 +137,7 @@ public class CalendarCanvas extends Canvas {
 		int column = e.x / cellWidth;
 		int row = (e.y - CALENDAR_HEADER_HEIGHT) / cellHeight;
 
-		YearMonth yearMonth = YearMonth.from(currentDate);
+		YearMonth yearMonth = YearMonth.from(selectedDate);
 		LocalDate firstDay = yearMonth.atDay(1);
 		int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
 
@@ -207,7 +205,7 @@ public class CalendarCanvas extends Canvas {
 		double cellWidth = (clientArea.width - 1) / 7.0;
 		double cellHeight = (clientArea.height - CALENDAR_HEADER_HEIGHT - 1) / 6.0;
 
-		YearMonth yearMonth = YearMonth.from(currentDate);
+		YearMonth yearMonth = YearMonth.from(selectedDate);
 		LocalDate firstDay = yearMonth.atDay(1);
 		int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
 		int daysInMonth = yearMonth.lengthOfMonth();
@@ -326,7 +324,7 @@ public class CalendarCanvas extends Canvas {
 	}
 
 	public void setCurrentDate(LocalDate date) {
-		this.currentDate = date;
+		this.selectedDate = date;
 		redraw();
 	}
 
