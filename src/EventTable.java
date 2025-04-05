@@ -1,6 +1,7 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class EventTable {
 	
 	private Table table;
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-	private List<CalendarEvent> events;
+	private List<CalendarEvent> events = new ArrayList<>();
 	private Listener eventChangeListener;
 	private Combo filterCombo;
 	
