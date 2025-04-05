@@ -73,11 +73,11 @@ public class CalendarCanvas extends Canvas {
 		addListener(SWT.MouseDown, e -> handleClick(e));
 
 		addListener(SWT.KeyDown, e -> {
-			MessageBox confirmBox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-			confirmBox.setText("Confirm Deletion");
-			confirmBox.setMessage("Are you sure you want to delete the selected event?");
-			if(confirmBox.open() == SWT.YES) {
-				if(e.keyCode == SWT.DEL) {
+			if(e.keyCode == SWT.DEL) {
+				MessageBox confirmBox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+				confirmBox.setText("Confirm Deletion");
+				confirmBox.setMessage("Are you sure you want to delete the selected event?");
+				if(confirmBox.open() == SWT.YES) {
 					CalendarEvent selectedEvent = getSelectedEvent();
 					if(selectedEvent != null) {
 						events.remove(selectedEvent);
