@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Shell;
 public class CalendarApp {
 	private static final Color COLOR_BLUE_HIGHLIGHT = new Color(46, 78, 145);
 	private static final Color COLOR_WHITE = new Color(255, 255, 255);
+	
+	private static String title = "Calendar";
 
 	private Display display;
 	private Shell shell;
@@ -47,7 +49,7 @@ public class CalendarApp {
 		shell = new Shell(display);
 		selectedDate = LocalDate.now();
 
-		shell.setText("SWT Calendar");
+		shell.setText(title);
 		shell.setSize(1200, 800);
 		GridLayout shellLayout = new GridLayout(1, false);
 		shell.setLayout(shellLayout);
@@ -205,6 +207,7 @@ public class CalendarApp {
 				displayException(e);
 			}
 			openedPath = path;
+			shell.setText(title + " - " + openedPath);
 			eventTable.updateEvents();
 			calendarCanvas.redraw();
 		}
@@ -234,6 +237,7 @@ public class CalendarApp {
 				displayException(e);
 			}
 			openedPath = new File(path);
+			shell.setText(title + " - " + openedPath);
 		}
 	}
 
