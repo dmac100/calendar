@@ -149,7 +149,7 @@ public class CalendarApp {
 
 		MenuItem saveAsItem = new MenuItem(fileMenu, SWT.PUSH);
 		saveAsItem.setText("Save &As...\tShift+Ctrl+S");
-		saveItem.setAccelerator(SWT.CTRL | SWT.SHIFT | 'S');
+		saveAsItem.setAccelerator(SWT.CTRL | SWT.SHIFT | 'S');
 		saveAsItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				saveAs();
