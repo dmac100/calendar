@@ -206,10 +206,12 @@ public class CalendarApp {
 	}
 	
 	public void open(File path) {
-		try(InputStream inputStream = new FileInputStream(path)) {
-			Cal4jHandler.openFile(inputStream, events);
-		} catch(IOException e) {
-			displayException(e);
+		if(path.exists()) {
+			try(InputStream inputStream = new FileInputStream(path)) {
+				Cal4jHandler.openFile(inputStream, events);
+			} catch(IOException e) {
+				displayException(e);
+			}
 		}
 		openedPath = path;
 		shell.setText(title + " - " + openedPath);
