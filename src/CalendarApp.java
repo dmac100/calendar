@@ -201,16 +201,20 @@ public class CalendarApp {
 		dialog.setFilterExtensions(new String[] { "*.ical", "*.*" });
 		File path = new File(dialog.open());
 		if(path != null) {
-			try(InputStream inputStream = new FileInputStream(path)) {
-				Cal4jHandler.openFile(inputStream, events);
-			} catch(IOException e) {
-				displayException(e);
-			}
-			openedPath = path;
-			shell.setText(title + " - " + openedPath);
-			eventTable.updateEvents();
-			calendarCanvas.redraw();
+			open(path);
 		}
+	}
+	
+	public void open(File path) {
+		try(InputStream inputStream = new FileInputStream(path)) {
+			Cal4jHandler.openFile(inputStream, events);
+		} catch(IOException e) {
+			displayException(e);
+		}
+		openedPath = path;
+		shell.setText(title + " - " + openedPath);
+		eventTable.updateEvents();
+		calendarCanvas.redraw();
 	}
 
 	private void save() {
@@ -260,6 +264,9 @@ public class CalendarApp {
 	}
 
 	public static void main(String[] args) {
-		new CalendarApp();
+		CalendarApp calendarApp = new CalendarApp();
+		if(args.length == 1) {
+			calendarApp.open(new File(args[0]));
+		}
 	}
 }
