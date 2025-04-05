@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.MessageBox;
 
 public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_WEEKEND_BACKGROUND = new Color(245, 245, 245);
@@ -72,12 +73,17 @@ public class CalendarCanvas extends Canvas {
 		addListener(SWT.MouseDown, e -> handleClick(e));
 
 		addListener(SWT.KeyDown, e -> {
-			if(e.keyCode == SWT.DEL) {
-				CalendarEvent selectedEvent = getSelectedEvent();
-				if(selectedEvent != null) {
-					events.remove(selectedEvent);
-					notifyListeners(SWT.Modify, new Event());
-					redraw();
+			MessageBox confirmBox = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			confirmBox.setText("Confirm Deletion");
+			confirmBox.setMessage("Are you sure you want to delete the selected event?");
+			if(confirmBox.open() == SWT.YES) {
+				if(e.keyCode == SWT.DEL) {
+					CalendarEvent selectedEvent = getSelectedEvent();
+					if(selectedEvent != null) {
+						events.remove(selectedEvent);
+						notifyListeners(SWT.Modify, new Event());
+						redraw();
+					}
 				}
 			}
 		});

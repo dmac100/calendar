@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -82,14 +83,19 @@ public class EventTable {
 			public void keyPressed(KeyEvent e) {
 				if(e.keyCode == SWT.DEL) {
 					int[] selectionIndices = table.getSelectionIndices();
-					Arrays.sort(selectionIndices);
-
-					for(int selectionIndex = selectionIndices.length - 1; selectionIndex >= 0; selectionIndex--) {
-						events.remove(selectionIndices[selectionIndex]);
+					MessageBox confirmBox = new MessageBox(table.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+					confirmBox.setText("Confirm Deletion");
+					confirmBox.setMessage("Are you sure you want to delete the selected event" + ((selectionIndices.length == 1) ? "?" : "s?"));
+					if(confirmBox.open() == SWT.YES) {
+						Arrays.sort(selectionIndices);
+	
+						for(int selectionIndex = selectionIndices.length - 1; selectionIndex >= 0; selectionIndex--) {
+							events.remove(selectionIndices[selectionIndex]);
+						}
+	
+						updateEvents();
+						notifyListeners();
 					}
-
-					updateEvents();
-					notifyListeners();
 				}
 			}
 		});
