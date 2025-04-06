@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -36,10 +38,12 @@ public class CalendarApp {
 	private Label monthLabel;
 	private LocalDate selectedDate;
 	private CalendarCanvas calendarCanvas;
-	private EventTable eventTable;
+	private EventsTable eventsTable;
+	private TasksTable tasksTable;
 	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
 
 	private List<CalendarEvent> events = new ArrayList<>();
+	private List<CalendarTask> tasks= new ArrayList<>();
 
 	private File openedPath;
 
@@ -48,7 +52,7 @@ public class CalendarApp {
 		selectedDate = LocalDate.now();
 
 		shell.setText(title);
-		shell.setSize(1200, 800);
+		shell.setSize(1200, 900);
 		GridLayout shellLayout = new GridLayout(1, false);
 		shell.setLayout(shellLayout);
 
@@ -67,9 +71,7 @@ public class CalendarApp {
 		topComposite.setLayout(topLayout);
 
 		// Create event table
-		eventTable = new EventTable(topComposite);
-		eventTable.setEvents(events);
-		eventTable.setEventChangeListener(e -> calendarCanvas.redraw());
+		createEventAndTaskTables(topComposite);
 
 		// Create composite for the bottom section (calendar)
 		Composite bottomComposite = new Composite(sashForm, SWT.NONE);
@@ -110,7 +112,7 @@ public class CalendarApp {
 		calendarCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Add listener for event changes
-		calendarCanvas.addListener(SWT.Modify, e -> eventTable.updateEvents());
+		calendarCanvas.addListener(SWT.Modify, e -> eventsTable.updateEvents());
 
 		calendarCanvas.addMouseWheelListener(e -> changeMonth((e.count > 0) ? -1 : 1));
 
@@ -118,6 +120,28 @@ public class CalendarApp {
 		sashForm.setWeights(new int[] { 20, 80 });
 
 		shell.open();
+	}
+
+	private void createEventAndTaskTables(Composite parent) {
+		CTabFolder tabFolder = new CTabFolder(parent, SWT.BORDER);
+		tabFolder.setSimple(false);
+		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		eventsTable = new EventsTable(tabFolder);
+		eventsTable.setEvents(events);
+		eventsTable.setEventsChangeListener(e -> calendarCanvas.redraw());
+		
+		tasksTable = new TasksTable(tabFolder);
+		tasksTable.setTasks(tasks);
+		tasksTable.setTasksChangeListener(e -> calendarCanvas.redraw());
+		
+		CTabItem eventsTab = new CTabItem(tabFolder, SWT.NONE);
+		eventsTab.setText("Events");
+		eventsTab.setControl(eventsTable.getControl());
+		
+		CTabItem tasksTab = new CTabItem(tabFolder, SWT.NONE);
+		tasksTab.setText("Tasks");
+		tasksTab.setControl(tasksTable.getControl());
 	}
 
 	private void createMenuBar() {
@@ -199,14 +223,15 @@ public class CalendarApp {
 	public void open(File path) {
 		if(path.exists()) {
 			try(InputStream inputStream = new FileInputStream(path)) {
-				Cal4jHandler.openFile(inputStream, events);
+				Cal4jHandler.openFile(inputStream, events, tasks);
 			} catch(IOException e) {
 				displayException(e);
 			}
 		}
 		openedPath = path;
 		shell.setText(title + " - " + path.getAbsolutePath());
-		eventTable.updateEvents();
+		eventsTable.updateEvents();
+		tasksTable.updateTasks();
 		calendarCanvas.redraw();
 	}
 
@@ -215,7 +240,7 @@ public class CalendarApp {
 			saveAs();
 		} else {
 			try(OutputStream outputStream = new FileOutputStream(openedPath)) {
-				Cal4jHandler.saveFile(outputStream, events);
+				Cal4jHandler.saveFile(outputStream, events, tasks);
 			} catch(IOException e) {
 				displayException(e);
 			}
@@ -229,7 +254,7 @@ public class CalendarApp {
 		String path = dialog.open();
 		if(path != null) {
 			try(OutputStream outputStream = new FileOutputStream(path)) {
-				Cal4jHandler.saveFile(outputStream, events);
+				Cal4jHandler.saveFile(outputStream, events, tasks);
 			} catch(IOException e) {
 				displayException(e);
 			}

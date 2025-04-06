@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,6 +16,8 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
@@ -26,12 +29,13 @@ import net.fortuna.ical4j.util.UidGenerator;
 public class Cal4jHandler {
 	private static final String PROD_ID = "-//Calendar App//iCal4j 4.1.1//EN";
 
-	public static void openFile(InputStream inputStream, List<CalendarEvent> events) throws IOException {
+	public static void openFile(InputStream inputStream, List<CalendarEvent> events, List<CalendarTask> tasks) throws IOException {
 		try {
 			CalendarBuilder builder = new CalendarBuilder();
 			Calendar calendar = builder.build(inputStream);
 
 			events.clear();
+			tasks.clear();
 			for(Component component:calendar.getComponents()) {
 				if(component instanceof VEvent event) {
 					CalendarEvent calendarEvent = new CalendarEvent();
@@ -61,6 +65,20 @@ public class Cal4jHandler {
 					});
 
 					events.add(calendarEvent);
+				} else if(component instanceof VToDo todo) {
+					CalendarTask calendarTask = new CalendarTask();
+					
+					calendarTask.setTitle(todo.getSummary().getValue());
+					
+					todo.getProperty(Property.DESCRIPTION).ifPresent(description -> {
+						calendarTask.setDescription(description.getValue());
+					});
+					
+					todo.getProperty(Property.COMPLETED).ifPresent(completed -> {
+						calendarTask.setCompleted(true);
+					});
+					
+					tasks.add(calendarTask);
 				}
 			}
 		} catch(ParserException e) {
@@ -68,7 +86,7 @@ public class Cal4jHandler {
 		}
 	}
 
-	public static void saveFile(OutputStream outputStream, List<CalendarEvent> events) throws IOException {
+	public static void saveFile(OutputStream outputStream, List<CalendarEvent> events, List<CalendarTask> tasks) throws IOException {
 		Calendar calendar = new Calendar();
 		calendar.add(new ProdId(PROD_ID));
 		calendar.add(ImmutableVersion.VERSION_2_0);
@@ -97,6 +115,22 @@ public class Cal4jHandler {
 			vEvent.add(uidGenerator.generateUid());
 
 			calendar.add(vEvent);
+		}
+		
+		for(CalendarTask task:tasks) {
+			VToDo vTodo = new VToDo(Instant.now(), task.getTitle());
+			
+			if(task.getDescription() != null) {
+				vTodo.add(new Description(task.getDescription()));
+			}
+			
+			if(task.isCompleted()) {
+				vTodo.add(new Completed(Instant.now()));
+			}
+
+			vTodo.add(uidGenerator.generateUid());
+
+			calendar.add(vTodo);
 		}
 
 		CalendarOutputter outputter = new CalendarOutputter();

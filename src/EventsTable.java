@@ -11,13 +11,13 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
@@ -25,19 +25,22 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-public class EventTable {
+public class EventsTable {
 	private static final String allEvents = "All Events";
 	private static final String eventsNextWeek = "Events in the next 7 days";
 	private static final String futureEvents = "Events in the future";
 	
-	private Table table;
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-	private List<CalendarEvent> events = new ArrayList<>();
-	private Listener eventChangeListener;
-	private Combo filterCombo;
 	
-	public EventTable(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+	private final Composite container;
+	private final Table table;
+	private final Combo filterCombo;
+	
+	private Listener eventsChangeListener;
+	private List<CalendarEvent> events = new ArrayList<>();
+	
+	public EventsTable(Composite parent) {
+		this.container = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
@@ -46,7 +49,7 @@ public class EventTable {
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		filterCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		filterCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		filterCombo.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false));
 		filterCombo.add(allEvents);
 		filterCombo.add(eventsNextWeek);
 		filterCombo.add(futureEvents);
@@ -135,8 +138,8 @@ public class EventTable {
 		};
 	}
 
-	public void setEventChangeListener(Listener listener) {
-		this.eventChangeListener = listener;
+	public void setEventsChangeListener(Listener listener) {
+		this.eventsChangeListener = listener;
 	}
 
 	public void setEvents(List<CalendarEvent> events) {
@@ -200,8 +203,12 @@ public class EventTable {
 		event.widget = table;
 		table.notifyListeners(SWT.Modify, event);
 
-		if(eventChangeListener != null) {
-			eventChangeListener.handleEvent(event);
+		if(eventsChangeListener != null) {
+			eventsChangeListener.handleEvent(event);
 		}
+	}
+	
+	public Control getControl() {
+		return container;
 	}
 }

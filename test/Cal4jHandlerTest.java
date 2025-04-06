@@ -1,5 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +25,7 @@ public class Cal4jHandlerTest {
 		event.setStartTime(LocalTime.of(14, 0));
 		events.add(event);
 		
-		Cal4jHandler.saveFile(byteArrayOutputStream, events);
+		Cal4jHandler.saveFile(byteArrayOutputStream, events, new ArrayList<>());
 		
 		System.out.println(byteArrayOutputStream);
 	}
@@ -43,11 +44,11 @@ public class Cal4jHandlerTest {
 		event.setEndTime(LocalTime.of(15, 0));
 		events.add(event);
 		
-		Cal4jHandler.saveFile(byteArrayOutputStream, events);
+		Cal4jHandler.saveFile(byteArrayOutputStream, events, new ArrayList<>());
 		
 		events.clear();
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-		Cal4jHandler.openFile(inputStream, events);
+		Cal4jHandler.openFile(inputStream, events, new ArrayList<>());
 		
 		assertEquals("Title", events.get(0).getTitle());
 		assertEquals("Description", events.get(0).getDescription());
@@ -68,13 +69,35 @@ public class Cal4jHandlerTest {
 		event.setDate(LocalDate.of(2000, 1, 1));
 		events.add(event);
 		
-		Cal4jHandler.saveFile(byteArrayOutputStream, events);
+		Cal4jHandler.saveFile(byteArrayOutputStream, events, new ArrayList<>());
 		
 		events.clear();
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-		Cal4jHandler.openFile(inputStream, events);
+		Cal4jHandler.openFile(inputStream, events, new ArrayList<>());
 		
 		assertEquals(LocalDate.of(2000, 1, 1), events.get(0).getDate());
 		assertNull(events.get(0).getStartTime());
+	}
+	
+	@Test
+	public void openFile_tasks() throws IOException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		
+		List<CalendarTask> tasks = new ArrayList<>();
+		var task = new CalendarTask();
+		task.setTitle("Title");
+		task.setDescription("Description");
+		task.setCompleted(true);
+		tasks.add(task);
+		
+		Cal4jHandler.saveFile(byteArrayOutputStream, new ArrayList<>(), tasks);
+		
+		tasks.clear();
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+		Cal4jHandler.openFile(inputStream, new ArrayList<>(), tasks);
+		
+		assertEquals("Title", tasks.get(0).getTitle());
+		assertEquals("Description", tasks.get(0).getDescription());
+		assertTrue(tasks.get(0).isCompleted());
 	}
 }

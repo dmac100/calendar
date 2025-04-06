@@ -4,8 +4,8 @@ import java.time.LocalTime;
 public class CalendarEvent {
 	private LocalDate date;
 	private LocalDate endDate;
-	private String title;
-	private String description;
+	private String title = "";
+	private String description = "";
 	private boolean selected;
 	private LocalTime startTime;
 	private LocalTime endTime;
