@@ -1,3 +1,5 @@
+package calendar;
+
 public class CalendarTask {
 	private String title = "";
 	private String description = "";

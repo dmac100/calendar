@@ -1,3 +1,5 @@
+package calendar.ui;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
+import calendar.CalendarTask;
 
 public class TasksTable {
 	private static final String allTasks = "All Tasks";

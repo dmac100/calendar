@@ -1,3 +1,5 @@
+package calendar;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,6 +29,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+
+import calendar.ui.CalendarCanvas;
+import calendar.ui.EventsTable;
+import calendar.ui.TasksTable;
 
 public class CalendarApp {
 	private static final Color COLOR_BLUE_HIGHLIGHT = new Color(46, 78, 145);

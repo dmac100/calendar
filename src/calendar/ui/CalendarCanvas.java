@@ -1,3 +1,5 @@
+package calendar.ui;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -18,6 +20,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.MessageBox;
+
+import calendar.CalendarEvent;
 
 public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_WEEKEND_BACKGROUND = new Color(245, 245, 245);

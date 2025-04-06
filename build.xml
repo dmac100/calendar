@@ -35,7 +35,7 @@
 				</archives>
 			</restrict>
 			<manifest>
-				<attribute name="Main-Class" value="CalendarApp"/>
+				<attribute name="Main-Class" value="calendar.CalendarApp"/>
 			</manifest>
 		</jar>
 	</target>

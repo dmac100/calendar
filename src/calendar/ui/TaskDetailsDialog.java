@@ -1,3 +1,5 @@
+package calendar.ui;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -8,6 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import calendar.CalendarTask;
 
 public class TaskDetailsDialog extends Dialog {
 	private CalendarTask task;

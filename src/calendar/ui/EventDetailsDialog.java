@@ -1,3 +1,5 @@
+package calendar.ui;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -15,6 +17,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import calendar.CalendarEvent;
 
 public class EventDetailsDialog extends Dialog {
 	private CalendarEvent event;
