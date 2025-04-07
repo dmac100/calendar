@@ -24,6 +24,7 @@ import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
@@ -120,14 +121,18 @@ public class Cal4jHandler {
 		}
 		
 		for(CalendarTask task:tasks) {
-			VToDo vTodo = new VToDo(Instant.now(), task.getTitle());
+			VToDo vTodo = new VToDo();
+			
+			if(task.getTitle() != null) {
+				vTodo.add(new Summary(task.getTitle()));
+			}
 			
 			if(task.getDescription() != null) {
 				vTodo.add(new Description(task.getDescription()));
 			}
 			
 			if(task.isCompleted()) {
-				vTodo.add(new Completed(Instant.now()));
+				vTodo.add(new Completed());
 			}
 
 			vTodo.add(uidGenerator.generateUid());
