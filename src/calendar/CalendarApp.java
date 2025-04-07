@@ -120,7 +120,11 @@ public class CalendarApp {
 		// Add listener for event changes
 		calendarCanvas.addListener(SWT.Modify, e -> eventsTable.updateEvents());
 
-		calendarCanvas.addMouseWheelListener(e -> changeMonth((e.count > 0) ? -1 : 1));
+		calendarCanvas.addMouseWheelListener(e -> {
+			if(e.count != 0) {
+				changeMonth((e.count > 0) ? -1 : 1);
+			}
+		});
 
 		// Set initial sash weights (20/80 split)
 		sashForm.setWeights(new int[] { 20, 80 });
@@ -282,6 +286,7 @@ public class CalendarApp {
 	}
 
 	private void changeMonth(int delta) {
+		System.out.println(delta);
 		selectedDate = selectedDate.plusMonths(delta);
 		updateMonthLabel();
 		calendarCanvas.setCurrentDate(selectedDate);
