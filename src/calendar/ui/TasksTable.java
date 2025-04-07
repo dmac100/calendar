@@ -73,7 +73,7 @@ public class TasksTable {
 			}
 		});
 		
-		table = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		table = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -110,6 +110,16 @@ public class TasksTable {
 			}
 		});
 		
+		table.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				for(TableItem item:table.getItems()) {
+					if(item.getData() instanceof CalendarTask task) {
+						task.setCompleted(item.getChecked());
+					}
+				}
+			}
+		});
+		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent event) {
 				int selectedIndex = table.getSelectionIndex();
@@ -121,7 +131,7 @@ public class TasksTable {
 				}
 			}
 		});
-
+		
 		TableSorter.addSortHandlers(table, () -> {
 			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
 			TableSorter.sortBy(tasks, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
@@ -172,11 +182,13 @@ public class TasksTable {
 		for(CalendarTask task:tasks) {
 			if(showTask(task)) {
 				TableItem item = new TableItem(table, SWT.NONE);
+				item.setData(task);
 				item.setText(new String[] {
-					task.isCompleted() ? "Yes" : "No",
+					"",
 					task.getTitle(),
 					task.getDescription()
 				});
+				item.setChecked(task.isCompleted());
 			}
 		}
 	}
