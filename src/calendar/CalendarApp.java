@@ -30,6 +30,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+
+import calendar.event.ChangeEvent;
 import calendar.ui.CalendarCanvas;
 import calendar.ui.EventsTable;
 import calendar.ui.TasksTable;
@@ -47,11 +51,14 @@ public class CalendarApp {
 	private EventsTable eventsTable;
 	private TasksTable tasksTable;
 	private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("MMMM yyyy");
+	
+	private final EventBus eventBus = new EventBus();
 
 	private List<CalendarEvent> events = new ArrayList<>();
 	private List<CalendarTask> tasks= new ArrayList<>();
 
 	private File openedPath;
+	private boolean modified = false;
 
 	public CalendarApp(Shell shell) {
 		this.shell = shell;
@@ -114,7 +121,7 @@ public class CalendarApp {
 		updateMonthLabel();
 
 		// Create calendar canvas
-		calendarCanvas = new CalendarCanvas(bottomComposite, selectedDate, events);
+		calendarCanvas = new CalendarCanvas(bottomComposite, selectedDate, events, eventBus);
 		calendarCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Add listener for event changes
@@ -128,6 +135,8 @@ public class CalendarApp {
 
 		// Set initial sash weights (20/80 split)
 		sashForm.setWeights(new int[] { 20, 80 });
+		
+		eventBus.register(this);
 
 		shell.open();
 	}
@@ -141,7 +150,7 @@ public class CalendarApp {
 		eventsTable.setEvents(events);
 		eventsTable.setEventsChangeListener(e -> calendarCanvas.redraw());
 		
-		tasksTable = new TasksTable(tabFolder);
+		tasksTable = new TasksTable(tabFolder, eventBus);
 		tasksTable.setTasks(tasks);
 		tasksTable.setTasksChangeListener(e -> calendarCanvas.redraw());
 		
@@ -239,7 +248,8 @@ public class CalendarApp {
 			}
 		}
 		openedPath = path;
-		shell.setText(title + " - " + path.getAbsolutePath());
+		modified = false;
+		refreshTitle();
 		eventsTable.updateEvents();
 		tasksTable.updateTasks();
 		calendarCanvas.redraw();
@@ -254,6 +264,8 @@ public class CalendarApp {
 			} catch(IOException e) {
 				displayException(e);
 			}
+			modified = false;
+			refreshTitle();
 		}
 	}
 
@@ -269,8 +281,27 @@ public class CalendarApp {
 				displayException(e);
 			}
 			openedPath = new File(path);
-			shell.setText(title + " - " + openedPath.getAbsolutePath());
+			modified = false;
+			refreshTitle();
 		}
+	}
+	
+	private void refreshTitle() {
+		if(openedPath == null) {
+			shell.setText(title);
+		} else {
+			if(modified) {
+				shell.setText(title + "*" + " - " + openedPath.getAbsolutePath());
+			} else {
+				shell.setText(title + " - " + openedPath.getAbsolutePath());
+			}
+		}
+	}
+	
+	@Subscribe
+	public void handleChangeEvent(ChangeEvent event) {
+		modified = true;
+		refreshTitle();
 	}
 
 	private void displayException(Exception e) {

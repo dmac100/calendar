@@ -24,12 +24,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.google.common.eventbus.EventBus;
+
 import calendar.CalendarTask;
+import calendar.event.ChangeEvent;
 
 public class TasksTable {
 	private static final String allTasks = "All Tasks";
 	private static final String uncompletedTasks = "Uncompleted Tasks";
 	
+	private final EventBus eventBus;
 	private final Composite container;
 	private final Table table;
 	private final Combo filterCombo;
@@ -37,8 +41,9 @@ public class TasksTable {
 	private Listener tasksChangeListener;
 	private List<CalendarTask> tasks = new ArrayList<>();
 	
-	public TasksTable(Composite parent) {
+	public TasksTable(Composite parent, EventBus eventBus) {
 		this.container = new Composite(parent, SWT.NONE);
+		this.eventBus = eventBus;
 		GridLayout containerLayout = new GridLayout(1, false);
 		containerLayout.marginWidth = 0;
 		containerLayout.marginHeight = 0;
@@ -128,6 +133,7 @@ public class TasksTable {
 					dialog.open();
 					
 					updateTasks();
+					notifyListeners();
 				}
 			}
 		});
@@ -214,6 +220,8 @@ public class TasksTable {
 		if(tasksChangeListener != null) {
 			tasksChangeListener.handleEvent(event);
 		}
+		
+		eventBus.post(new ChangeEvent());
 	}
 	
 	public Control getControl() {

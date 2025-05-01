@@ -21,7 +21,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.MessageBox;
 
+import com.google.common.eventbus.EventBus;
+
 import calendar.CalendarEvent;
+import calendar.event.ChangeEvent;
 
 public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_WEEKEND_BACKGROUND = new Color(245, 245, 245);
@@ -42,6 +45,8 @@ public class CalendarCanvas extends Canvas {
 	private static final Color COLOR_EVENT_TEXT = new Color(50, 50, 50);
 	private static final int CALENDAR_HEADER_HEIGHT = 20;
 
+	private final EventBus eventBus;
+	
 	private Font normalFont;
 	private Font boldFont;
 	private LocalDate selectedDate;
@@ -49,10 +54,11 @@ public class CalendarCanvas extends Canvas {
 	private int eventHeight = 18;
 	private int dayHeaderHeight = 20;
 
-	public CalendarCanvas(Composite parent, LocalDate selectedDate, List<CalendarEvent> events) {
+	public CalendarCanvas(Composite parent, LocalDate selectedDate, List<CalendarEvent> events, EventBus eventBus) {
 		super(parent, SWT.DOUBLE_BUFFERED);
 		this.selectedDate = selectedDate;
 		this.events = events;
+		this.eventBus = eventBus;
 
 		loadFonts();
 		setupListeners();
@@ -88,7 +94,7 @@ public class CalendarCanvas extends Canvas {
 					CalendarEvent selectedEvent = getSelectedEvent();
 					if(selectedEvent != null) {
 						events.remove(selectedEvent);
-						notifyListeners(SWT.Modify, new Event());
+						notifyListeners();
 						redraw();
 					}
 				}
@@ -134,7 +140,7 @@ public class CalendarCanvas extends Canvas {
 						}
 						// Select the clicked event
 						dayEvents.get(eventIndex).setSelected(true);
-						notifyListeners(SWT.Modify, new Event());
+						notifyListeners();
 					}
 				}
 			}
@@ -174,7 +180,7 @@ public class CalendarCanvas extends Canvas {
 						EventDetailsDialog dialog = new EventDetailsDialog(getShell(), clickedEvent);
 						dialog.open();
 
-						notifyListeners(SWT.Modify, new Event());
+						notifyListeners();
 						redraw();
 
 						return;
@@ -194,7 +200,7 @@ public class CalendarCanvas extends Canvas {
 			if(dialog.wasSaved()) {
 				events.add(newEvent);
 
-				notifyListeners(SWT.Modify, new Event());
+				notifyListeners();
 				redraw();
 			}
 		}
@@ -206,7 +212,6 @@ public class CalendarCanvas extends Canvas {
 				event.setSelected(false);
 			}
 		}
-		notifyListeners(SWT.Modify, new Event());
 	}
 
 	private void drawCalendar(GC gc) {
@@ -367,6 +372,11 @@ public class CalendarCanvas extends Canvas {
 			}
 		}
 		return null;
+	}
+	
+	private void notifyListeners() {
+		notifyListeners(SWT.Modify, new Event());
+		eventBus.post(new ChangeEvent());
 	}
 
 	@Override
