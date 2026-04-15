@@ -139,9 +139,6 @@ public class TasksTable {
 		});
 		
 		TableSorter.addSortHandlers(table, () -> {
-			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
-			TableSorter.sortBy(tasks, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
-
 			updateTasks();
 			notifyListeners();
 		});
@@ -183,6 +180,9 @@ public class TasksTable {
 
 	public void updateTasks() {
 		if(tasks == null) return;
+
+		int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
+		TableSorter.sortBy(tasks, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
 
 		table.removeAll();
 		for(CalendarTask task:tasks) {

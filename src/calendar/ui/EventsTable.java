@@ -123,9 +123,6 @@ public class EventsTable {
 		});
 
 		TableSorter.addSortHandlers(table, () -> {
-			int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
-			TableSorter.sortBy(events, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
-
 			updateEvents();
 			notifyListeners();
 		});
@@ -153,6 +150,9 @@ public class EventsTable {
 
 	public void updateEvents() {
 		if(events == null) return;
+
+		int sortIndex = Arrays.asList(table.getColumns()).indexOf(table.getSortColumn());
+		TableSorter.sortBy(events, (table.getSortDirection() == SWT.UP), row -> getField(row, sortIndex));
 
 		table.removeAll();
 		for(CalendarEvent event:events) {
